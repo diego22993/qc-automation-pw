@@ -1,0 +1,23 @@
+{
+  "name": "qc-automation-pw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diego22993/qc-automation-pw.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/diego22993/qc-automation-pw/issues"
+  },
+  "homepage": "https://github.com/diego22993/qc-automation-pw#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.4"
+  }
+}
