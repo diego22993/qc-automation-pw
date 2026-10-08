@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/diego22993/qc-automation-pw#readme",
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@types/node": "^26.6.4"
   }
 }
