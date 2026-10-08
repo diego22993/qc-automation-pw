@@ -103,3 +103,6 @@ temp/
 Thumbs.db
 $RECYCLE.BIN/
 desktop.ini
+node_modules/
+test-results/
+playwright-report/
