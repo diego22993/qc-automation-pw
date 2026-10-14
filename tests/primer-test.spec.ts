@@ -1,9 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-
-  
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
+test('Mi primer test: Verificar titulo de Google', async ({ page }) => {
+await page.goto('https://www.google.com');
+await expect(page).toHaveTitle(/Google/);
 });
