@@ -55,7 +55,7 @@ test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin si
 
   });
 
-  test('Proceso completo de compra en un solo flujo monolítico', async ({ page }) => {
+  test('Proceso completo de compra y vuelta a productos', async ({ page }) => {
 
     // 1. Navegación inicial a la plataforma
     await page.goto('https://www.saucedemo.com/');
