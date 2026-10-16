@@ -56,3 +56,5 @@ test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin si
   });
 
 });
+
+// Localizar el back to home y el generar pdf, hacerle click al pdf, los dos flujos
