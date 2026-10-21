@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin sin Pasos Integrados', () => {
 
-  test('Proceso completo de compra en un solo flujo monolítico', async ({ page }) => {
+  test('Proceso completo de compra en un solo flujo monolítico y vuelta a Inicio', async ({ page }) => {
 
     // 1. Navegación inicial a la plataforma
     await page.goto('https://www.saucedemo.com/');
@@ -54,6 +54,82 @@ test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin si
     await expect(page.locator('[data-test="complete-header"]')).toHaveText('Thank you for your order!');
 
     await expect(page.locator('[data-test="back-to-products"]')).toBeVisible();
+
+    await page.locator('[data-test="back-to-products"]').click();
+
+    await expect(page).toHaveURL(/.*inventory.html/);
+
+  });
+  
+
+  test('Proceso completo de compra en un solo flujo monolítico con validación de PDF generado', async ({ page }, testInfo) => {
+
+    // 1. Navegación inicial a la plataforma
+    await page.goto('https://www.saucedemo.com/');
+    await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+  // 2. Proceso de autenticación de usuario
+    await page.locator('[data-test="username"]').fill('standard_user');
+    await page.locator('[data-test="password"]').fill('secret_sauce');
+    await page.locator('[data-test="login-button"]').click();
+
+    // Validar redirección e ingreso a la tienda
+    await expect(page).toHaveURL(/.*inventory.html/);
+    await expect(page.locator('[data-test="title"]')).toHaveText('Products');
+
+    // 3. Selección y adición de productos al carrito
+    await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+
+
+    // 4. Navegación al carrito de compras
+    await page.locator('[data-test="shopping-cart-link"]').click();
+    await expect(page).toHaveURL(/.*cart.html/);
+
+
+    // Iniciar flujo de compra
+    await page.locator('[data-test="checkout"]').click();
+
+    // 5. Formulario de datos del comprador (Checkout - Step One)
+    await expect(page).toHaveURL(/.*checkout-step-one.html/);
+    await page.locator('[data-test="firstName"]').fill('Juan');
+    await page.locator('[data-test="lastName"]').fill('Gomez');
+    await page.locator('[data-test="postalCode"]').fill('5000');
+    await page.locator('[data-test="continue"]').click();
+
+    // 6. Resumen de compra y pago (Checkout - Step Two)
+    await expect(page).toHaveURL(/.*checkout-step-two.html/);
+    
+    await page.locator('[data-test="finish"]').click();
+
+    // 7. Confirmación final de la orden (Checkout Complete)
+    await expect(page).toHaveURL(/.*checkout-complete.html/);
+    await expect(page.locator('[data-test="complete-header"]')).toBeVisible();
+    await expect(page.locator('[data-test="complete-header"]')).toHaveText('Thank you for your order!');
+
+    await expect(page.locator('[data-test="back-to-products"]')).toBeVisible();
+    await expect(page.locator('[data-test="generate-pdf-order"]')).toBeVisible();
+
+    // 6. Descarga y validación del PDF
+    const downloadPromise = page.waitForEvent('download');
+    await page.locator('[data-test="generate-pdf-order"]').click();
+    const download = await downloadPromise;
+
+    // Verificar que la descarga no se haya cancelado ni haya fallado
+    expect(await download.failure()).toBeNull();
+
+    // Validar extensión / nombre sugerido
+    const fileName = download.suggestedFilename();
+    expect(fileName).toMatch(/\.pdf$/i);
+
+    // Guardar el archivo en la carpeta de salida del test
+    const filePath = testInfo.outputPath(fileName);
+    await download.saveAs(filePath);
+
+    // Opcional: adjuntar el PDF al reporte HTML de Playwright
+    await testInfo.attach('comprobante-orden', {
+      path: filePath,
+      contentType: 'application/pdf',
+    });
 
   });
 
