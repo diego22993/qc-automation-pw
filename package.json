@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/diego22993/qc-automation-pw.git"
