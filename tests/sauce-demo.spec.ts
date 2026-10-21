@@ -53,6 +53,11 @@ test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin si
     await expect(page.locator('[data-test="complete-header"]')).toBeVisible();
     await expect(page.locator('[data-test="complete-header"]')).toHaveText('Thank you for your order!');
 
+    //PDF
+    if (test.info().project.name === 'chromium') {
+      await page.pdf({ path: 'comprobante-checkout.pdf', format: 'A4' });
+    }
+
   });
 
 });
