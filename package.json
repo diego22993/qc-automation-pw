@@ -5,7 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "npx playwright test",
-    "test:ui": "npx playwright test --ui"
+    "test:ui": "npx playwright test --ui",
+    "test:login": "npx playwright test --ui --grep @login", 
+    "test:inventario": "npx playwright test --ui --grep @inventario",
+    "test:carro": "npx playwright test --ui --grep @carro",
+    "test:checkout": "npx playwright test --ui --grep @checkout1",
+    "test:checkout2": "npx playwright test --ui --grep @checkout2",
+    "test:report": "npx playwright show-report",
+    "testReport": "npx playwright test && npx playwright show-report"
   },
   "repository": {
     "type": "git",
