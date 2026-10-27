@@ -11,6 +11,10 @@
     "test:carro": "npx playwright test --ui --grep @carro",
     "test:checkout": "npx playwright test --ui --grep @checkout1",
     "test:checkout2": "npx playwright test --ui --grep @checkout2",
+    "test:login": "npx playwright test --ui --grep @login-inv",
+    "test:login": "npx playwright test --ui --grep @cart-nav",
+    "test:login": "npx playwright test --ui --grep @formCheckout1",
+    "test:login": "npx playwright test --ui --grep @formCheckout2",
     "test:report": "npx playwright show-report",
     "testReport": "npx playwright test && npx playwright show-report"
   },
