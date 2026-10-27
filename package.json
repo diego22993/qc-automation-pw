@@ -6,6 +6,9 @@
   "scripts": {
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui",
+    "test:smoke": "npx playwright test --ui --grep @smoke",
+    "test:basico": "npx playwright test --ui --grep @basico",
+    "test:tag": "npx playwright test --ui --grep ",
     "test:report": "npx playwright show-report",
     "testReport": "npx playwright test && npx playwright show-report"
   },

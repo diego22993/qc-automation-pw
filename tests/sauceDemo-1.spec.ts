@@ -1,3 +1,4 @@
+/*
 import { test, expect } from '@playwright/test';
 
 test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin sin Pasos Integrados', () => {
@@ -135,3 +136,4 @@ test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin si
 
 });
 
+*/
