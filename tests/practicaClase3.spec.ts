@@ -416,3 +416,42 @@ test.describe('PARTE 2 NIVEL INTERMEDIO: FORMULARIO CHECKOUT-STEP-TWO & COMPLETE
         await expect(page).toHaveURL(/.*inventory.html/);
     });
 });
+
+test.describe('PARTE 3: NIVEL AVANZADO: MENÚ LATERAL & ACCESIBILIDAD', {tag:['@menuLateral']}, () =>{
+    test.beforeEach(async ({ page }) =>{
+        //Navegamos a la pagina sauce demo
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // completamos usuario y pasword, y click en login
+        await page.locator('#user-name').fill('standard_user');
+        await page.locator('#password').fill('secret_sauce');
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
+    test('Ejercicio 41', async ({ page }) =>{
+        // En /inventory.html, abre el menú lateral haciendo clic en el botón con ID #react-burger-menu-btn.
+        await page.locator('#react-burger-menu-btn').click()
+    });
+    test('Ejercicio 42', async ({ page }) =>{
+        // Abrimos menu hamburguesa
+        await page.locator('#react-burger-menu-btn').click()
+        //Localizamos el enlace Logout. NOTA:
+        // El elemento tiene role="button" explícito. Ese atributo sobrescribe el rol implícito de <a href>, así que para Playwright no es un link,
+        // es un button. Por eso getByRole('link', { name: 'Logout' }) no lo encuentra
+        const linkLogout = page.getByRole('button', { name: 'Logout' });
+        await expect(linkLogout).toBeVisible();    
+        //Hacemos click en link Logout
+        await linkLogout.click();
+    });
+        test('Ejercicio 43', async ({ page }) =>{
+        // Abrimos menu hamburguesa
+        await page.locator('#react-burger-menu-btn').click()
+        //Localizamos el enlace Reset App State.
+        const resetApp = page.getByRole('button', { name: 'Reset App State' });
+        await expect(resetApp).toBeVisible();    
+        //Hacemos click en link Logout
+        await resetApp.click();
+    });
+
+});
