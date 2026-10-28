@@ -87,7 +87,9 @@ test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario']
     });
 
     test('Ejercicio 9', async ({ page }) => {
-        // Descripción: 
+        // Descripción: (getByAltText): Ubica la imagen principal de la camiseta usando getByAltText('Sauce Labs Bolt T-Shirt’).
+
+        await expect(page.getByAltText('Sauce Labs Bolt T-Shirt', { exact: true })).toBeVisible();
     });
 
     test('Ejercicio 10', async ({ page }) => {
