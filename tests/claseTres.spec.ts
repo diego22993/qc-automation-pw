@@ -159,9 +159,57 @@ test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito'] }, ()
 });
 
 test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@checkout-one'] }, () => {
-    test('Ejercicio 16', async ({ page }) => { });
-    test('Ejercicio 17', async ({ page }) => { });
-    test('Ejercicio 18', async ({ page }) => { });
+    
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+
+        // Agregar un producto al carrito
+        await page.getByRole('button', { name: 'Add to Cart' }).first().click();
+
+        // Ingresar al carrito
+        await page.locator('#shopping_cart_container').getByRole('button').click();
+
+        // Verificar ubicación en Carrito
+        await expect(page).toHaveURL(/.*cart.html/);
+
+        // Ingresar a Checkout-step-one
+        await page.getByRole('button', { name: 'Checkout' }).click();
+
+        // Verificar ubicación en Checkout-step-one
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+    });
+
+    test('Ejercicio 16', async ({ page }) => {
+        // Descripción: (getByPlaceholder): Rellena el campo First Name usando su placeholder "First Name".
+
+        await page.getByPlaceholder('First Name').fill('Azul');
+        await expect(page.getByPlaceholder('First Name')).toHaveValue('Azul');
+    });
+
+    test('Ejercicio 17', async ({ page }) => {
+        // Descripción: (getByPlaceholder): Rellena el campo Last Name usando su placeholder "Last Name".
+
+        await page.getByPlaceholder('Last Name').fill('Vela');
+        await expect(page.getByPlaceholder('Last Name')).toHaveValue('Vela');
+    });
+
+    test('Ejercicio 18', async ({ page }) => {
+        // Descripción: (getByPlaceholder): Rellena el campo Zip/Postal Code usando su placeholder "Zip/Postal Code".
+
+        await page.getByPlaceholder('Zip/Postal Code').fill('1234');
+        await expect(page.getByPlaceholder('Zip/Postal Code')).toHaveValue('1234');
+    });
+
 });
 
 test.describe('Ejercicios en Checkout-step-two - Nivel básico', { tag: ['@checkout-two'] }, () => {
