@@ -128,12 +128,51 @@ test('ejercicio 5 - 6', async ({ page }) => {
     await bikeLightItem.locator('button').click();
 
     //Ejercicio 26 (Encadenamiento en Inventario): Desde #inventory_container, encadena la búsqueda hasta encontrar todos los elementos con la clase .inventory_item_price.
+    const inventoryContainer = page.locator('#inventory_container');
+    const itemPrices = inventoryContainer.locator('.inventory_item_price');
+    await expect(itemPrices).toHaveCount(6);
 
+    //
 
     });
   });
 
 /* 
+    Ejercicio 27 (Validación de Precio con Chaining): Filtra el producto "Sauce Labs Fleece Jacket" y encadena la
+búsqueda para verificar que su precio sea "$49.99".
 
+Ejercicio 28 (Badge de Carrito): Agrega dos productos y encadena locators desde el contenedor
+.shopping_cart_container para verificar que la etiqueta .shopping_cart_badge muestre "2".
+
+Ejercicio 29 (.filter() en Carrito): En /cart.html, filtra los ítems .cart_item buscando aquel que contenga el texto
+"Sauce Labs Backpack" y haz clic en su botón "Remove".
+Ejercicio 30 (Lista vacía en Carrito): Remueve todos los ítems del carrito y valida que .cart_item tenga un conteo
+(count()) igual a 0.
+Ejercicio 31 (getByRole Navegación): Desde /cart.html, haz clic en el botón de rol button con nombre "Checkout"
+para navegar a la siguiente pantalla.
+
+Ejercicio 32 (Validación de Error en Formulario): Intenta hacer clic en "Continue" en /checkout-step-one.html sin
+llenar los campos y valida el mensaje de error con getByText('Error: First Name is required’).
+
+Ejercicio 33 (Llenado Completo con Placeholders): Completa los tres campos de información personal usando
+únicamente getByPlaceholder.
+
+Ejercicio 34 (Boton Cancelar): En /checkout-step-one.html, presiona el botón "Cancel" usando getByRole y
+confirma el retorno a /cart.html.
+Ejercicio 35 (Resumen Financiero - Item Total): En /checkout-step-two.html, ubica el elemento
+.summary_subtotal_label y verifica que contenga el prefijo "Item total:".
+
+Ejercicio 36 (Resumen Financiero - Impuestos): Valida la visibilidad del texto de impuesto .summary_tax_label.
+
+Ejercicio 37 (Resumen Financiero - Total Final): Valida que el selector .summary_total_label esté visible.
+
+Ejercicio 38 (Confirmación de Envío): En /checkout-step-two.html, presiona el botón "Finish" usando
+getByRole('button', { name: 'Finish' }).
+
+Ejercicio 39 (Texto Descriptivo de Confirmación): En /checkout-complete.html, valida el texto secundario "Your
+order has been dispatched".
+
+Ejercicio 40 (Botón Regreso al Inicio):En /checkout-complete.html, presiona el botón "Back Home" y confirma el
+retorno a /inventory.html.
 */
 
