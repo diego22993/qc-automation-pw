@@ -159,7 +159,7 @@ test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito'] }, ()
 });
 
 test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@checkout-one'] }, () => {
-    
+
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
         await page.goto('https://www.saucedemo.com/');
@@ -213,8 +213,60 @@ test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@check
 });
 
 test.describe('Ejercicios en Checkout-step-two - Nivel básico', { tag: ['@checkout-two'] }, () => {
-    test('Ejercicio 19', async ({ page }) => { });
-    test('Ejercicio 20', async ({ page }) => { });
+
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+
+        // Agregar un producto al carrito
+        await page.getByRole('button', { name: 'Add to Cart' }).first().click();
+
+        // Ingresar al carrito
+        await page.locator('#shopping_cart_container').getByRole('button').click();
+
+        // Verificar ubicación en Carrito
+        await expect(page).toHaveURL(/.*cart.html/);
+
+        // Ingresar a Checkout-step-one
+        await page.getByRole('button', { name: 'Checkout' }).click();
+
+        // Verificar ubicación en Checkout-step-one
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+
+        // Rellenar campos de Checkout-step-one
+        await page.getByPlaceholder('First Name').fill('Azul');
+        await page.getByPlaceholder('Last Name').fill('Vela');
+        await page.getByPlaceholder('Zip/Postal Code').fill('1234');
+
+        // Continuar a Checkout-step-two
+        await page.getByRole('button', { name: 'Continue' }).click();
+
+        // Verificar ubicación en Checkout-step-two
+        await expect(page).toHaveURL(/.*checkout-step-two\.html/);
+    });
+
+    test('Ejercicio 19', async ({ page }) => {
+        // Descripción: (getByText): En /checkout-step-two.html, ubica el texto "Payment Information:".
+
+        await expect(page.getByText('Payment Information:', { exact: true })).toBeVisible();
+    });
+
+    test('Ejercicio 20', async ({ page }) => {
+        // Descripción: En /checkout-complete.html, valida que el título de agradecimiento sea un heading con texto "Thank you for your order!".
+
+        await page.getByRole('button', { name: 'Finish' }).click();
+        await expect(page.getByRole('heading', { name: 'Thank you for your order!', level: 2 })).toBeVisible();
+    });
+
 });
 
 test.describe('Ejercicios en Login e Inventario - Nivel intermedio', { tag: ['@LoginInventario'] }, () => {
