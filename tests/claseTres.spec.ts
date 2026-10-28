@@ -19,8 +19,9 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
     test('Ejercicio 2', async ({ page }) => {
         // Descripción: (getByPlaceholder): Completa el campo de contraseña escribiendo secret_sauce identificándolo por su placeholder.
 
-        await page.getByPlaceholder('Password').fill('secret_sauce');
-        await page.pause();
+        const password = page.getByPlaceholder('Password');
+        await password.fill('secret_sauce');
+        await expect(password).toHaveValue('secret_sauce');
     });
 
     test('Ejercicio 3', async ({ page }) => {
