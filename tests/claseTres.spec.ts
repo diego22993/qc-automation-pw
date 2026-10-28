@@ -41,8 +41,9 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
     test('Ejercicio 5', async ({ page }) => {
         // Descripción: (CSS Selector ID): Completa el campo de usuario utilizando su ID directo(#user-name).
 
-        await page.locator('#user-name').fill('standard_user');
-        await page.pause();
+        const username = page.locator('#user-name');
+        await username.fill('standard_user');
+        await expect(username).toHaveValue('standard_user');
     });
 
     test('Ejercicio 6', async ({ page }) => {
@@ -73,7 +74,7 @@ test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario']
     test('Ejercicio 7', async ({ page }) => {
         // Descripción: (getByRole - Heading): Tras iniciar sesión, verifica que exista un encabezado de nivel 1 o título visible con el texto "Swag Labs".
         await expect(page.getByText('Swag Labs', { exact: true })).toBeVisible();
-        
+
         await expect(page.getByRole('heading', { level: 1 })).toHaveCount(0);
     });
 
