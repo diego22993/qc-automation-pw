@@ -18,6 +18,7 @@
     "test:menuLateral": "npx playwright test --ui --grep @menuLateral",
     "test:collecciones": "npx playwright test --ui --grep @collecciones",
     "test:e2e": "npx playwright test --ui --grep @e2e",
+    "test:flujoCompleto": "npx playwright test --ui --grep @flujoCompleto",
     "test:report": "npx playwright show-report",
     "testReport": "npx playwright test && npx playwright show-report"
   },

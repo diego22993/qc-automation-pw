@@ -577,3 +577,273 @@ test.describe('PARTE 3: NIVEL AVANZADO: VALIDACIÓN E2E', {tag:['@e2e']}, () =>{
     });
 
 });
+
+test.describe('PARTE 3: NIVEL AVANZADO: FLUJOS COMPLETOS INTEGRALES', {tag:['@flujoCompleto']}, () =>{
+    test.beforeEach(async ({ page }) =>{
+        //Navegamos a la pagina sauce demo
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // completamos usuario y pasword, y click en login
+        await page.locator('#user-name').fill('standard_user');
+        await page.locator('#password').fill('secret_sauce');
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
+    test('Ejercicio 53', async ({ page }) =>{
+        //Realiza la compra de 1 producto navegando secuencialmente por las 6 pantallas (/ /inventory.html /cart.html /checkout-step-one.html 
+        // /checkout-step-two.html /checkout-complete.html).
+        //Agregamos producto
+        await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+        //Vamos al carrito
+        await page.locator('[data-test="shopping-cart-link"]').click();
+        await expect(page).toHaveURL(/.*cart.html/);
+        //Vamos al checkout
+        await page.locator('[data-test="checkout"]').click();
+        await expect(page).toHaveURL(/.*checkout-step-one.html/);
+        //Rellenamos formulario
+        await page.locator('[data-test="firstName"]').fill('Juan');
+        await page.locator('[data-test="lastName"]').fill('Pérez');
+        await page.locator('[data-test="postalCode"]').fill('5000');
+        //Vamos al paso 2 del chackout
+        await page.locator('[data-test="continue"]').click();
+        await expect(page).toHaveURL(/.*checkout-step-two.html/);
+        await expect(page.getByText('Sauce Labs Backpack')).toBeVisible();
+        //vamos al complete del checkout
+        await page.locator('[data-test="finish"]').click();
+        await expect(page).toHaveURL(/.*checkout-complete.html/);
+        await expect(page.locator('[data-test="back-to-products"]')).toBeVisible();
+    });
+    test('Ejercicio 54', async ({ page }) => {
+        const productos = [
+            'Sauce Labs Backpack',
+            'Sauce Labs Bike Light',
+            'Sauce Labs Bolt T-Shirt'
+        ];
+
+        // 1. Agregamos 3 productos específicos usando .filter()
+        for (const nombre of productos) {
+            await page
+                .locator('.inventory_item')
+                .filter({ hasText: nombre })
+                .getByRole('button', { name: 'Add to cart' })
+                .click();
+        }
+        await expect(page.locator('.shopping_cart_badge')).toHaveText('3');
+
+        // 2. Vamos al carrito y validamos los nombres en /cart.html
+        await page.locator('.shopping_cart_link').click();
+        await expect(page).toHaveURL(/.*cart\.html/);
+
+        const nombresCarrito = page.locator('.inventory_item_name');
+        await expect(nombresCarrito).toHaveCount(3);
+        await expect(nombresCarrito).toHaveText(productos);
+
+        // 3. Checkout: datos del cliente
+        await page.locator('[data-test="checkout"]').click();
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+        await page.locator('[data-test="firstName"]').fill('Diego');
+        await page.locator('[data-test="lastName"]').fill('Perez');
+        await page.locator('[data-test="postalCode"]').fill('1234');
+        await page.locator('[data-test="continue"]').click();
+
+        // 4. Resumen y finalizar compra
+        await expect(page).toHaveURL(/.*checkout-step-two\.html/);
+        await page.locator('[data-test="finish"]').click();
+
+        // 5. Confirmamos el mensaje final
+        await expect(page).toHaveURL(/.*checkout-complete\.html/);
+        await expect(page.locator('[data-test="complete-header"]')).toHaveText('Thank you for your order!');
+    });
+    test('Ejercicio 55', async ({ page }) => {
+        // 1. Agregamos 2 productos desde el inventario
+        await page.locator('.inventory_item')
+            .filter({ hasText: 'Sauce Labs Backpack' })
+            .getByRole('button', { name: 'Add to cart' })
+            .click();
+        await page.locator('.inventory_item')
+            .filter({ hasText: 'Sauce Labs Bike Light' })
+            .getByRole('button', { name: 'Add to cart' })
+            .click();
+        await expect(page.locator('.shopping_cart_badge')).toHaveText('2');
+
+        // 2. Vamos al carrito
+        await page.locator('.shopping_cart_link').click();
+        await expect(page).toHaveURL(/.*cart\.html/);
+        await expect(page.locator('.cart_item')).toHaveCount(2);
+
+        // 3. Eliminamos 1 producto usando .filter()
+        await page.locator('.cart_item')
+            .filter({ hasText: 'Sauce Labs Bike Light' })
+            .getByRole('button', { name: 'Remove' })
+            .click();
+
+        // Confirmamos que queda 1 solo ítem
+        await expect(page.locator('.cart_item')).toHaveCount(1);
+        await expect(page.locator('.inventory_item_name')).toHaveText('Sauce Labs Backpack');
+        await expect(page.locator('.shopping_cart_badge')).toHaveText('1');
+
+        // 4. Checkout: datos del cliente
+        await page.locator('[data-test="checkout"]').click();
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+        await page.locator('[data-test="firstName"]').fill('Diego');
+        await page.locator('[data-test="lastName"]').fill('Perez');
+        await page.locator('[data-test="postalCode"]').fill('1234');
+        await page.locator('[data-test="continue"]').click();
+
+        // 5. Resumen: solo 1 ítem, y finalizamos
+        await expect(page).toHaveURL(/.*checkout-step-two\.html/);
+        await expect(page.locator('.cart_item')).toHaveCount(1);
+        await page.locator('[data-test="finish"]').click();
+
+        // 6. Confirmamos el mensaje final
+        await expect(page).toHaveURL(/.*checkout-complete\.html/);
+        await expect(page.locator('[data-test="complete-header"]'))
+            .toHaveText('Thank you for your order!');
+    });
+    test('Ejercicio 56', async ({ page }) => {
+        // 1. Agregamos un producto
+        await page.locator('.inventory_item')
+            .filter({ hasText: 'Sauce Labs Backpack' })
+            .getByRole('button', { name: 'Add to cart' })
+            .click();
+        await expect(page.locator('.shopping_cart_badge')).toHaveText('1');
+
+        // 2. Carrito -> checkout step one
+        await page.locator('.shopping_cart_link').click();
+        await page.locator('[data-test="checkout"]').click();
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+
+        // 3. Dejamos el Zip en blanco y continuamos
+        await page.locator('[data-test="firstName"]').fill('Diego');
+        await page.locator('[data-test="lastName"]').fill('Perez');
+        await page.locator('[data-test="continue"]').click();
+
+        // 4. Validamos el mensaje de error específico
+        await expect(page.locator('[data-test="error"]'))
+            .toHaveText('Error: Postal Code is required');
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+
+        // 5. Completamos el campo faltante y continuamos
+        await page.locator('[data-test="postalCode"]').fill('1234');
+        await page.locator('[data-test="continue"]').click();
+
+        // 6. Resumen y finalizar compra
+        await expect(page).toHaveURL(/.*checkout-step-two\.html/);
+        await page.locator('[data-test="finish"]').click();
+
+        // 7. Confirmamos el mensaje final
+        await expect(page).toHaveURL(/.*checkout-complete\.html/);
+        await expect(page.locator('[data-test="complete-header"]'))
+            .toHaveText('Thank you for your order!');
+    });
+    test('Ejercicio 57', async ({ page }) => {
+        // 1. Agregamos un producto
+        await page.locator('.inventory_item')
+            .filter({ hasText: 'Sauce Labs Backpack' })
+            .getByRole('button', { name: 'Add to cart' })
+            .click();
+        await expect(page.locator('.shopping_cart_badge')).toHaveText('1');
+
+        // 2. Carrito -> checkout step one
+        await page.locator('.shopping_cart_link').click();
+        await page.locator('[data-test="checkout"]').click();
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+
+        // 3. Completamos los datos y continuamos
+        await page.locator('[data-test="firstName"]').fill('Diego');
+        await page.locator('[data-test="lastName"]').fill('Perez');
+        await page.locator('[data-test="postalCode"]').fill('1234');
+        await page.locator('[data-test="continue"]').click();
+
+        // 4. Llegamos al paso 2 (resumen)
+        await expect(page).toHaveURL(/.*checkout-step-two\.html/);
+
+        // 5. Presionamos Cancel
+        await page.locator('[data-test="cancel"]').click();
+
+        // 6. Verificamos el retorno a /inventory.html
+        await expect(page).toHaveURL(/.*inventory\.html/);
+        await expect(page.locator('.inventory_item')).toHaveCount(6);
+    });
+    test('Ejercicio 58', async ({ page }) => {
+        // 1. Agregamos un producto
+        await page.locator('.inventory_item')
+            .filter({ hasText: 'Sauce Labs Backpack' })
+            .getByRole('button', { name: 'Add to cart' })
+            .click();
+        await expect(page.locator('.shopping_cart_badge')).toHaveText('1');
+
+        // 2. Carrito -> checkout step one
+        await page.locator('.shopping_cart_link').click();
+        await expect(page).toHaveURL(/.*cart\.html/);
+        await page.locator('[data-test="checkout"]').click();
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+
+        // 3. Presionamos Cancel: vuelve a /cart.html
+        await page.locator('[data-test="cancel"]').click();
+        await expect(page).toHaveURL(/.*cart\.html/);
+
+        // 4. Presionamos Continue Shopping: vuelve a /inventory.html
+        await page.locator('[data-test="continue-shopping"]').click();
+        await expect(page).toHaveURL(/.*inventory\.html/);
+        await expect(page.locator('.inventory_item')).toHaveCount(6);
+    });
+    test('Ejercicio 60', async ({ page }) => {
+        // 1. Ordenamos por precio de menor a mayor
+        await page.locator('[data-test="product-sort-container"]').selectOption('lohi');
+        await expect(page.locator('.inventory_item_price').first()).toHaveText('$7.99');
+
+        // 2. Agregamos el más barato (.first()) y el más caro (.last())
+        const items = page.locator('.inventory_item');
+        const masBarato = items.first();
+        const masCaro = items.last();
+
+        // Guardamos los nombres antes de agregar, para validarlos después
+        const nombreBarato = await masBarato.locator('.inventory_item_name').innerText();
+        const nombreCaro = await masCaro.locator('.inventory_item_name').innerText();
+
+        await masBarato.getByRole('button', { name: 'Add to cart' }).click();
+        await masCaro.getByRole('button', { name: 'Add to cart' }).click();
+        await expect(page.locator('.shopping_cart_badge')).toHaveText('2');
+
+        // 3. Vamos al carrito y eliminamos el más barato
+        await page.locator('.shopping_cart_link').click();
+        await expect(page).toHaveURL(/.*cart\.html/);
+        await expect(page.locator('.cart_item')).toHaveCount(2);
+
+        await page.locator('.cart_item')
+            .filter({ hasText: nombreBarato })
+            .getByRole('button', { name: 'Remove' })
+            .click();
+
+        // Confirmamos que el badge indica "1"
+        await expect(page.locator('.shopping_cart_badge')).toHaveText('1');
+        await expect(page.locator('.cart_item')).toHaveCount(1);
+
+        // 4. Checkout: completamos el formulario
+        await page.locator('[data-test="checkout"]').click();
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+        await page.locator('[data-test="firstName"]').fill('Diego');
+        await page.locator('[data-test="lastName"]').fill('Perez');
+        await page.locator('[data-test="postalCode"]').fill('1234');
+        await page.locator('[data-test="continue"]').click();
+
+        // 5. Validamos que en el paso 2 el producto sea el más caro ($49.99)
+        await expect(page).toHaveURL(/.*checkout-step-two\.html/);
+        await expect(page.locator('.cart_item')).toHaveCount(1);
+        await expect(page.locator('.inventory_item_name')).toHaveText(nombreCaro);
+        await expect(page.locator('.inventory_item_price')).toHaveText('$49.99');
+
+        // 6. Finalizamos la compra
+        await page.locator('[data-test="finish"]').click();
+        await expect(page).toHaveURL(/.*checkout-complete\.html/);
+        await expect(page.locator('[data-test="complete-header"]'))
+            .toHaveText('Thank you for your order!');
+
+        // 7. Volvemos a la pantalla principal y comprobamos que el carrito quedó limpio
+        await page.locator('[data-test="back-to-products"]').click();
+        await expect(page).toHaveURL(/.*inventory\.html/);
+        await expect(page.locator('.shopping_cart_badge')).toHaveCount(0);
+    });
+});
