@@ -351,23 +351,110 @@ test.describe('Ejercicios en Inventario - Nivel intermedio', { tag: ['@inventari
 
     test('Ejercicio 27', async ({ page }) => {
         // Descripcion: (Validación de Precio con Chaining): Filtra el producto "Sauce Labs Fleece Jacket" y encadena la búsqueda para verificar que su precio sea "$49.99".
-    
+
         await expect(page.locator('[data-test="inventory-item"]').filter({ hasText: 'Sauce Labs Fleece Jacket' }).locator('[data-test="inventory-item-price"]')).toHaveText('$49.99');
     });
 
 });
 
 test.describe('Ejercicios en Carrito y Navegación - Nivel intermedio', { tag: ['@carrito', '@intermedio'] }, () => {
-    test('Ejercicio 28', async ({ page }) => { });
-    test('Ejercicio 29', async ({ page }) => { });
-    test('Ejercicio 30', async ({ page }) => { });
-    test('Ejercicio 31', async ({ page }) => { });
+
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
+
+    test('Ejercicio 28', async ({ page }) => {
+        // Descripción: (Badge de Carrito): Agrega dos productos y encadena locators desde el contenedor .shopping_cart_container para verificar que la etiqueta .shopping_cart_badge muestre "2".
+
+        // Agregar dos productos al carrito
+        await page.getByRole('button', { name: 'Add to Cart' }).first().click();
+        await page.getByRole('button', { name: 'Add to Cart' }).last().click();
+
+        // Verificar que la etiqueta .shopping_cart_badge muestre "2"
+        await expect(page.locator('.shopping_cart_container').locator('.shopping_cart_badge')).toHaveText('2');
+    });
+
+    test('Ejercicio 29', async ({ page }) => {
+        // Descripción: (.filter() en Carrito): En /cart.html, filtra los ítems .cart_item buscando aquel que contenga el texto "Sauce Labs Backpack" y haz clic en su botón "Remove".
+
+        // Agregar el producto "Sauce Labs Backpack" al carrito
+        await page.locator('#add-to-cart-sauce-labs-backpack').click();
+
+        // Ingresar al carrito y verificar ubicación en Carrito
+        await page.locator('#shopping_cart_container').getByRole('button').click();
+        await expect(page).toHaveURL(/cart\.html/);
+
+        // Filtrar por el producto "Sauce Labs Backpack" y hacer clic en su botón "Remove"
+        const producto = page.locator('.cart_item').filter({ hasText: 'Sauce Labs Backpack' });
+        await producto.getByRole('button', { name: 'Remove' }).click();
+        await expect(producto).toHaveCount(0); // Verificamos que el producto ya no esté en el carrito
+    });
+
+    test('Ejercicio 30', async ({ page }) => {
+        // Descripción: (Lista vacía en Carrito): Remueve todos los ítems del carrito y valida que .cart_item tenga un conteo (count()) igual a 0.
+
+        // Agregar dos productos al carrito
+        await page.getByRole('button', { name: 'Add to Cart' }).first().click();
+        await page.getByRole('button', { name: 'Add to Cart' }).last().click();
+
+        // Ingresar al carrito y verificar ubicación en Carrito
+        await page.locator('#shopping_cart_container').getByRole('button').click();
+        await expect(page).toHaveURL(/cart\.html/);
+
+        // Hacer clic en todos los botones "Remove"
+        const botonesRemove = page.locator('.cart_item').getByRole('button', { name: 'Remove' });
+
+        while (await botonesRemove.count() > 0) {
+            const count = await botonesRemove.count();
+            await botonesRemove.first().click();
+            await expect(botonesRemove).toHaveCount(count - 1); // Se recomienda verificar que vaya disminyendo
+        }
+
+        // Validar que .cart_item tenga un conteo igual a 0
+        await expect(page.locator('.cart_item')).toHaveCount(0);
+    });
+
+    test('Ejercicio 31', async ({ page }) => {
+        // Descripción: (getByRole Navegación): Desde /cart.html, haz clic en el botón de rol button con nombre "Checkout" para navegar a la siguiente pantalla.
+
+        // Agregar un producto al carrito
+        await page.getByRole('button', { name: 'Add to Cart' }).first().click();
+
+        // Ingresar al carrito y verificar ubicación en Carrito
+        await page.locator('#shopping_cart_container').getByRole('button').click();
+        await expect(page).toHaveURL(/cart\.html/);
+
+        // Ingresar a Checkout-step-one y verificar ubicación en Checkout-step-one
+        await page.getByRole('button', { name: 'Checkout' }).click();
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+    });
+
 });
 
 test.describe('Ejercicios en Checkout-step-one - Nivel intermedio', { tag: ['@checkout-one', '@intermedio'] }, () => {
-    test('Ejercicio 32', async ({ page }) => { });
-    test('Ejercicio 33', async ({ page }) => { });
-    test('Ejercicio 34', async ({ page }) => { });
+
+    test('Ejercicio 32', async ({ page }) => {
+
+    });
+
+    test('Ejercicio 33', async ({ page }) => {
+
+    });
+
+    test('Ejercicio 34', async ({ page }) => {
+
+    });
+
 });
 
 test.describe('Ejercicios en Checkout-step-two - Nivel intermedio', { tag: ['@checkout-two', '@intermedio'] }, () => {
