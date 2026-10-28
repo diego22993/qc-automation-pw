@@ -1,6 +1,6 @@
    import { test, expect } from '@playwright/test';
 
-test.describe('ejercicios clase 3-login', () => {
+test.describe('ejercicios clase 3 - del 1 al 20', () => {
 
   test('ejercicio 1 - 2 - 3', async ({ page }) => {
 
@@ -96,30 +96,44 @@ test('ejercicio 5 - 6', async ({ page }) => {
     // texto "Thank you for your order!".
     await page.locator('[data-test="finish"]').click();
     await expect(page.getByRole('heading', { name: 'Thank you for your order!' })).toBeVisible();
+    
     });
+
    });
+
+   test.describe('ejercicios clase 3 - del 21 al 40', () => {
+
+  test('ejercicio 21 - 22 - 23 - 24 - 25', async ({ page }) => {
+
+    // Ejercicio 21 (CSS Atributo Personalizado): Selecciona el botón de login usando el atributo de test nativo [data-test="login-button"].
+    await page.goto('https://www.saucedemo.com/');
+    await expect(page).toHaveURL('https://www.saucedemo.com/');
+    await page.locator('[data-test="username"]').fill('standard_user');
+    await page.locator('[data-test="password"]').fill('secret_sauce');
+    await page.locator('.submit-button').click();
+
+    // Ejercicio 22 (getByRole Combobox): En /inventory.html, selecciona la opción de ordenamiento "Price (low to high)" interactuando con el selector de rol combobox.
+    await page.getByRole('combobox').selectOption('lohi');
+
+    // Ejercicio 23 (getByRole Combobox): Cambia el ordenamiento a "Name (Z to A)" comprobando que el valor cambie a za.
+    await page.getByRole('combobox').selectOption('za');
+    await expect(page.getByRole('combobox')).toHaveValue('za');
+
+    //Ejercicio 24 (.filter() por Texto): Filtra los bloques de productos .inventory_item para obtener únicamente el que contiene el texto "Sauce Labs Onesie".
+    const onesieItem = page.locator('.inventory_item').filter({ hasText: 'Sauce Labs Onesie' });
+    await expect(onesieItem).toBeVisible();
+
+    //Ejercicio 25 (.filter() + Acción): Filtra la tarjeta del producto "Sauce Labs Bike Light" y haz clic en su botón interno de agregar al carrito.
+    const bikeLightItem = page.locator('.inventory_item').filter({ hasText: 'Sauce Labs Bike Light' });
+    await bikeLightItem.locator('button').click();
+
+    //Ejercicio 26 (Encadenamiento en Inventario): Desde #inventory_container, encadena la búsqueda hasta encontrar todos los elementos con la clase .inventory_item_price.
+
+
+    });
+  });
 
 /* 
 
-
-Ejercicio 21 (CSS Atributo Personalizado): Selecciona el botón de login usando el atributo de test nativo [data-
-test="login-button"].
-
-Ejercicio 22 (getByRole Combobox): En /inventory.html, selecciona la opción de ordenamiento "Price (low to high)"
-interactuando con el selector de rol combobox.
-
-Ejercicio 23 (getByRole Combobox): Cambia el ordenamiento a "Name (Z to A)" comprobando que el valor cambie
-a za.
-
-Ejercicio 24 (.filter() por Texto): Filtra los bloques de productos .inventory_item para obtener únicamente el que
-contiene el texto "Sauce Labs Onesie".
-
-Ejercicio 25 (.filter() + Acción): Filtra la tarjeta del producto "Sauce Labs Bike Light" y haz clic en su botón interno de
-agregar al carrito.
-Ejercicio 26 (Encadenamiento en Inventario): Desde #inventory_container, encadena la búsqueda hasta encontrar
-todos los elementos con la clase .inventory_item_price.
-
-Ejercicio 27 (Validación de Precio con Chaining): Filtra el producto "Sauce Labs Fleece Jacket" y encadena la
-búsqueda para verificar que su precio sea "$49.99".
 */
 
