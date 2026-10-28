@@ -519,3 +519,61 @@ test.describe('PARTE 3: NIVEL AVANZADO: MANIPULACIÓN COLLECCIONES', {tag:['@col
     });
 
 });
+
+test.describe('PARTE 3: NIVEL AVANZADO: VALIDACIÓN E2E', {tag:['@e2e']}, () =>{
+    test.beforeEach(async ({ page }) =>{
+        //Navegamos a la pagina sauce demo
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // completamos usuario y pasword, y click en login
+        await page.locator('#user-name').fill('standard_user');
+        await page.locator('#password').fill('secret_sauce');
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
+    test('Ejercicio 48', async ({ page }) =>{
+        //En /inventory.html, haz clic en la imagen de un producto específico usando getByAltText, valida la redirección a /inventory-item.html 
+        // y confirma el botón "Back to products".
+        await page.getByAltText('Sauce Labs Backpack').click();
+        await expect(page).toHaveURL(/.*inventory-item.html/);
+        await expect(page.getByRole('button', { name: 'Back to products' })).toBeVisible();
+    });
+    test('Ejercicio 49', async ({ page }) =>{
+        //Agrega un producto desde su página de detalle /inventory-item.html y confirma que el botón cambie a "Remove".
+        await page.getByAltText('Sauce Labs Backpack').click();
+        await expect(page).toHaveURL(/.*inventory-item.html/);
+        //Agregamos producto al carro
+        const boton = page.locator('.btn_inventory');
+        await boton.click();
+        //Confirmamos que cambio a Remove
+        await expect(boton).toHaveText('Remove');
+    });
+    test('Ejercicio 50', async ({ page }) => {
+        // Cambiamos el ordenamiento a Z-A
+        await page.locator('[data-test="product-sort-container"]').selectOption('za');
+
+        // Verificamos que el primer producto sea el esperado
+        await expect(page.locator('.inventory_item_name').first())
+        .toHaveText('Test.allTheThings() T-Shirt (Red)');
+    });
+    test('Ejercicio 51', async ({ page }) => {
+        // Cambiamos el ordenamiento a precio ascendente (Low to High)
+        await page.locator('[data-test="product-sort-container"]').selectOption('lohi');
+
+        // Encadenamos: primer producto -> su precio
+        const primerPrecio = page.locator('.inventory_item').first().locator('.inventory_item_price');
+
+        await expect(primerPrecio).toHaveText('$7.99');
+    });
+    test('Ejercicio 52', async ({ page }) => {
+        // Cambiamos el ordenamiento a precio descendente (High to Low)
+        await page.locator('[data-test="product-sort-container"]').selectOption('hilo');
+
+        // Encadenamos: primer producto -> su precio
+        const primerPrecio = page.locator('.inventory_item').first().locator('.inventory_item_price');
+
+        await expect(primerPrecio).toHaveText('$49.99');
+    });
+
+});
