@@ -269,7 +269,24 @@ test.describe('Ejercicios en Checkout-step-two - Nivel básico', { tag: ['@check
 
 });
 
-test.describe('Ejercicios en Login e Inventario - Nivel intermedio', { tag: ['@LoginInventario', '@intermedio'] }, () => {
+test.describe('Ejercicios en Login - Nivel intermedio', { tag: ['@login', '@intermedio'] }, () => {
+
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+    });
+
+    test('Ejercicio 21', async ({ page }) => {
+        // Descripcion: (CSS Atributo Personalizado): Selecciona el botón de login usando el atributo de test nativo [data-test="login-button"].
+
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page.getByText('Epic sadface: Username is required')).toBeVisible();
+    });
+
+});
+
+test.describe('Ejercicios en Inventario - Nivel intermedio', { tag: ['@inventario', '@intermedio'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
@@ -285,44 +302,57 @@ test.describe('Ejercicios en Login e Inventario - Nivel intermedio', { tag: ['@L
         await expect(page).toHaveURL(/.*inventory.html/);
     });
 
-    test('Ejercicio 21', async ({ page }) => {
-        // Descripcion: (CSS Atributo Personalizado): Selecciona el botón de login usando el atributo de test nativo [data-test="login-button"].
-
-        await page.locator('[data-test="login-button"]').click();
-        await page.pause();
-    });
-
     test('Ejercicio 22', async ({ page }) => {
         // Descripcion: (getByRole Combobox): En /inventory.html, selecciona la opción de ordenamiento "Price (low to high)" interactuando con el selector de rol combobox.
+
         await page.getByRole('combobox').selectOption('lohi');
-        await page.pause();
+        await expect(page.locator('[data-test="active-option"]')).toHaveText('Price (low to high)'); // toHaveText solo funciona sobre un locator
     });
 
     test('Ejercicio 23', async ({ page }) => {
         // Descripcion: (getByRole Combobox): Cambia el ordenamiento a "Name (Z to A)" comprobando que el valor cambie a za.
 
-
-
+        await page.getByRole('combobox').selectOption('za');
+        await expect(page.locator('[data-test="active-option"]')).toHaveText('Name (Z to A)');
     });
 
     test('Ejercicio 24', async ({ page }) => {
-        // Descripcion: (filter() + getByText): Filtra los bloques de productos .inventory_item para obtener únicamente el que contiene el texto "Sauce Labs Onesie".
+        // Descripcion: (.filter() por Texto): Filtra los bloques de productos .inventory_item para obtener únicamente el que contiene el texto "Sauce Labs Onesie".
 
+        // El locator da una lista de elementos, y .filter() deja pasar solo los que cumplen una condición.
+        const producto = page.locator('.inventory_item').filter({ hasText: 'Sauce Labs Onesie' }); // Con .filter() llegamos a la tarjeta que contiene ese texto.
+        await expect(producto).toHaveCount(1);
+        await expect(producto).toBeVisible();
+        await expect(producto.locator('.inventory_item_name')).toHaveText('Sauce Labs Onesie');
     });
 
     test('Ejercicio 25', async ({ page }) => {
-        // Descripcion:  (.filter() + Acción): Filtra la tarjeta del producto "Sauce Labs Bike Light" y haz clic en su botón interno de agregar al carrito.
+        // Descripcion: (.filter() + Acción): Filtra la tarjeta del producto "Sauce Labs Bike Light" y haz clic en su botón interno de agregar al carrito.
 
+        const producto = page.locator('.inventory_item').filter({ hasText: 'Sauce Labs Bike Light' });
+        await producto.getByRole('button', { name: 'Add to cart' }).click();
+        await expect(producto.getByRole('button', { name: 'Remove' })).toBeVisible(); // Verficamos que el botón cambie a "Remove"
     });
 
     test('Ejercicio 26', async ({ page }) => {
         // Descripcion: (Encadenamiento en Inventario): Desde #inventory_container, encadena la búsqueda hasta encontrar todos los elementos con la clase .inventory_item_price.
 
+        const precios = page
+            .locator('#inventory_container')
+            .locator('[data-test="inventory-list"]')
+            .locator('[data-test="inventory-item-description"]')
+            .locator('.pricebar')
+            .locator('.inventory_item_price');
+
+        // const precios = page.locator('#inventory_container').locator('.inventory_item_price'); Lo que más sirve
+
+        await expect(precios).toHaveCount(6);
     });
 
     test('Ejercicio 27', async ({ page }) => {
         // Descripcion: (Validación de Precio con Chaining): Filtra el producto "Sauce Labs Fleece Jacket" y encadena la búsqueda para verificar que su precio sea "$49.99".
-
+    
+        await expect(page.locator('[data-test="inventory-item"]').filter({ hasText: 'Sauce Labs Fleece Jacket' }).locator('[data-test="inventory-item-price"]')).toHaveText('$49.99');
     });
 
 });
