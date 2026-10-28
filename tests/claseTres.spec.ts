@@ -100,11 +100,16 @@ test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario']
     });
 
     test('Ejercicio 11', async ({ page }) => {
-        // Descripción: 
+        // Descripción: (.last()): Haz clic en el último botón de agregar al carrito utilizando .last().
+
+        await page.getByRole('button', { name: 'Add to Cart' }).last().click();
+        await expect(page.getByRole('button', { name: 'Remove' })).toBeVisible(); // Se evalua que el botón cambia a "Remove"
     });
 
     test('Ejercicio 12', async ({ page }) => {
-        // Descripción: 
+        // Descripción: (.nth()): Selecciona el segundo producto de la lista (índice 1) y haz clic en la imagen del producto.
+
+        
     });
 
 });
