@@ -1,6 +1,6 @@
 
 import { Page, Locator } from '@playwright/test';
-import { BookingBasePage } from './BookingBasePage';
+import { BookingBasePage } from '../../../page/BookingBasePage';
 
 export class BookingSearchPage extends BookingBasePage {
   private destinationInput: Locator;
