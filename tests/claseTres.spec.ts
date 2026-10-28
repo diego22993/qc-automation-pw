@@ -109,7 +109,9 @@ test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario']
     test('Ejercicio 12', async ({ page }) => {
         // Descripción: (.nth()): Selecciona el segundo producto de la lista (índice 1) y haz clic en la imagen del producto.
 
-        
+        // Cuando un locator encuentra varios elementos, .nth(i) se queda con uno solo según su posición. El índice empieza en 0.
+        await page.locator('[data-test="inventory-item"]').nth(1).getByRole('img').click(); 
+        await expect(page).toHaveURL(/inventory-item\.html/);
     });
 
 });
