@@ -55,7 +55,7 @@ test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin si
 
   });
 
-  test('Proceso completo de compra y vuelta a productos', async ({ page }) => {
+  test('BACK TO HOME AFTER CHECKOUT', async ({ page }) => {
 
     // 1. Navegación inicial a la plataforma
     await page.goto('https://www.saucedemo.com/');
@@ -107,6 +107,20 @@ test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin si
     await expect(page.locator('[data-test="complete-header"]')).toHaveText('Thank you for your order!');
 
 
-    await expect(page.locator('[data-test="back-to-products"]')).toBeVisible();
+    //await expect(page.locator('[data-test="back-to-products"]')).toBeVisible();
+    await expect(page.locator('#back-to-products')).toBeVisible();
+  });
+
+
+  test('back to home', async ()=>{
+    
+  })
+
+  test('generar pdf', async ()=>{
+    
+  })
+
+  test.only('ir a booking', async ({page})=>{
+    await page.goto('https://www.booking.com/');
   });
 });
