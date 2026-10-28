@@ -34,14 +34,7 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: 'brave',
-      use: {...devices['Desktop Chrome'], launchOptions: {
-      executablePath: 'C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe',
-        },
-      },
-    },
-
+   
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
