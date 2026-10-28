@@ -501,12 +501,78 @@ test.describe('Ejercicios en Checkout-step-one - Nivel intermedio', { tag: ['@ch
 });
 
 test.describe('Ejercicios en Checkout-step-two - Nivel intermedio', { tag: ['@checkout-two', '@intermedio'] }, () => {
-    test('Ejercicio 35', async ({ page }) => { });
-    test('Ejercicio 36', async ({ page }) => { });
-    test('Ejercicio 37', async ({ page }) => { });
-    test('Ejercicio 38', async ({ page }) => { });
-    test('Ejercicio 39', async ({ page }) => { });
-    test('Ejercicio 40', async ({ page }) => { });
+
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+
+        // Agregar un producto al carrito
+        await page.getByRole('button', { name: 'Add to Cart' }).first().click();
+
+        // Ingresar al carrito
+        await page.locator('#shopping_cart_container').getByRole('button').click();
+
+        // Verificar ubicación en Carrito
+        await expect(page).toHaveURL(/.*cart.html/);
+
+        // Ingresar a Checkout-step-one
+        await page.getByRole('button', { name: 'Checkout' }).click();
+
+        // Verificar ubicación en Checkout-step-one
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+
+        // Rellenar campos de Checkout-step-one
+        await page.getByPlaceholder('First Name').fill('Azul');
+        await page.getByPlaceholder('Last Name').fill('Vela');
+        await page.getByPlaceholder('Zip/Postal Code').fill('1234');
+
+        // Continuar a Checkout-step-two
+        await page.getByRole('button', { name: 'Continue' }).click();
+
+        // Verificar ubicación en Checkout-step-two
+        await expect(page).toHaveURL(/.*checkout-step-two\.html/);
+    });
+
+    test('Ejercicio 35', async ({ page }) => {
+        // Descripción: (Resumen Financiero - Item Total): En /checkout-step-two.html, ubica el elemento .summary_subtotal_label y verifica que contenga el prefijo "Item total:".
+
+        
+    });
+
+    test('Ejercicio 36', async ({ page }) => {
+        // Descripción: (Resumen Financiero - Impuestos): Valida la visibilidad del texto de impuesto .summary_tax_label.
+
+    });
+
+    test('Ejercicio 37', async ({ page }) => {
+        // Descripción: (Resumen Financiero - Total Final): Valida que el selector .summary_total_label esté visible.
+
+    });
+
+    test('Ejercicio 38', async ({ page }) => {
+        // Descripción: (Confirmación de Envío): En /checkout-step-two.html, presiona el botón "Finish" usando getByRole('button', { name: 'Finish' }).
+
+    });
+
+    test('Ejercicio 39', async ({ page }) => {
+        // Descripción: (Texto Descriptivo de Confirmación): En /checkout-complete.html, valida el texto secundario "Your order has been dispatched".
+
+    });
+
+    test('Ejercicio 40', async ({ page }) => {
+        // Descripción: (Botón Regreso al Inicio): En /checkout-complete.html, presiona el botón "Back Home" y confirma el retorno a /inventory.html.
+
+    });
+
 });
 
 test.describe('Ejercicios en Menú lateral y Accesibilidad - Nivel avanzado', { tag: ['@menu-accessibility', '@avanzado'] }, () => {

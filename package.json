@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test":"npx playwright test",
-    "test:ui":"npx playwright test --ui"
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "debug:": "npx playwright test --debug",
+    "debug:booking": "npx playwright test --debug --grep @booking"
   },
   "repository": {
     "type": "git",
