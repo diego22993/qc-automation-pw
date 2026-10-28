@@ -443,16 +443,59 @@ test.describe('Ejercicios en Carrito y Navegación - Nivel intermedio', { tag: [
 
 test.describe('Ejercicios en Checkout-step-one - Nivel intermedio', { tag: ['@checkout-one', '@intermedio'] }, () => {
 
-    test('Ejercicio 32', async ({ page }) => {
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
 
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+
+        // Agregar un producto al carrito
+        await page.getByRole('button', { name: 'Add to Cart' }).first().click();
+
+        // Ingresar al carrito
+        await page.locator('#shopping_cart_container').getByRole('button').click();
+
+        // Verificar ubicación en Carrito
+        await expect(page).toHaveURL(/.*cart.html/);
+
+        // Ingresar a Checkout-step-one
+        await page.getByRole('button', { name: 'Checkout' }).click();
+
+        // Verificar ubicación en Checkout-step-one
+        await expect(page).toHaveURL(/.*checkout-step-one\.html/);
+    });
+
+    test('Ejercicio 32', async ({ page }) => {
+        // Descripción: (Validación de Error en Formulario): Intenta hacer clic en "Continue" en /checkout-step-one.html sin llenar los campos y valida el mensaje de error con getByText('Error: First Name is required’).
+
+        await page.getByRole('button', { name: 'Continue' }).click();
+        await expect(page.getByText('Error: First Name is required', { exact: true })).toBeVisible();
     });
 
     test('Ejercicio 33', async ({ page }) => {
+        // Descripción: (Llenado Completo con Placeholders): Completa los tres campos de información personal usando únicamente getByPlaceholder.
 
+        await page.getByPlaceholder('First Name').fill('Azul');
+        await page.getByPlaceholder('Last Name').fill('Vela');
+        await page.getByPlaceholder('Zip/Postal Code').fill('1234');
+
+        await expect(page.getByPlaceholder('First Name')).toHaveValue('Azul');
+        await expect(page.getByPlaceholder('Last Name')).toHaveValue('Vela');
+        await expect(page.getByPlaceholder('Zip/Postal Code')).toHaveValue('1234');
     });
 
     test('Ejercicio 34', async ({ page }) => {
+        // Descripción: (Boton Cancelar): En /checkout-step-one.html, presiona el botón "Cancel" usando getByRole y confirma el retorno a /cart.html.
 
+        await page.getByRole('button', { name: 'Cancel' }).click();
+        await expect(page).toHaveURL(/cart\.html/);
     });
 
 });
