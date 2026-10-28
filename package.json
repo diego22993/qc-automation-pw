@@ -1,0 +1,34 @@
+{
+  "name": "qc-automation-pw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:smoke": "npx playwright test --ui --grep @smoke",
+    "test:booking": "npx playwright test --ui --grep @booking",
+    "debug:booking": "npx playwright test --debug --grep @booking",
+    "allure:generate": "npx allure generate allure-results --clean -o allure-report",
+    "allure:open": "npx allure open allure-report",
+    "allure:serve": "npx allure serve allure-results"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diego22993/qc-automation-pw.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/diego22993/qc-automation-pw/issues"
+  },
+  "homepage": "https://github.com/diego22993/qc-automation-pw#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "allure-commandline": "^2.46.1",
+    "allure-playwright": "^3.14.0"
+  }
+}

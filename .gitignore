@@ -103,3 +103,10 @@ temp/
 Thumbs.db
 $RECYCLE.BIN/
 desktop.ini
+
+# Playwright
+node_modules/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
