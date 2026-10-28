@@ -455,3 +455,67 @@ test.describe('PARTE 3: NIVEL AVANZADO: MENÚ LATERAL & ACCESIBILIDAD', {tag:['@
     });
 
 });
+
+test.describe('PARTE 3: NIVEL AVANZADO: MANIPULACIÓN COLLECCIONES', {tag:['@collecciones']}, () =>{
+    test.beforeEach(async ({ page }) =>{
+        //Navegamos a la pagina sauce demo
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // completamos usuario y pasword, y click en login
+        await page.locator('#user-name').fill('standard_user');
+        await page.locator('#password').fill('secret_sauce');
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
+    test('Ejercicio 44', async ({ page }) =>{
+        //Selecciona el 1.º, 3.º y 5.º producto del catálogo usando .nth(0), .nth(2) y .nth(4), agregándolos al carrito.
+        const prod1 = page.locator('.inventory_item').nth(0);
+        await prod1.getByRole('button', { name: 'Add to cart'}).click();
+        const prod2 = page.locator('.inventory_item').nth(2);
+        await prod2.getByRole('button', { name: 'Add to cart'}).click();
+        const prod3 = page.locator('.inventory_item').nth(4);
+        await prod3.getByRole('button', { name: 'Add to cart'}).click();
+    });
+    test('Ejercicio 45', async ({ page }) =>{
+        //En /inventory.html, filtra los elementos .inventory_item que contengan un botón con el texto "Add to cart" y valida cuántos quedan 
+        // sin agregar.
+        const sinAgregar = page.locator('.inventory_item').filter({
+        has: page.getByRole('button', { name: 'Add to cart' })
+        });
+        // Al inicio no se agregó nada, así que deberían quedar los 6 productos
+         await expect(sinAgregar).toHaveCount(6);
+    });
+    test('Ejercicio 46', async ({ page }) =>{
+        //Agrego 4 productos al carrito 
+        await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+        await page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
+        await page.locator('[data-test="add-to-cart-sauce-labs-bolt-t-shirt"]').click();
+        await page.locator('[data-test="add-to-cart-sauce-labs-fleece-jacket"]').click();
+        //Navego a /cart.html
+        await page.locator('[data-test="shopping-cart-link"]').click();
+        await expect(page).toHaveURL(/.*cart.html/);
+        //Validar estrictamente con expect(page.locator('.cart_item')).toHaveCount(4).
+        await expect(page.locator('.cart_item')).toHaveCount(4)
+    });
+    test('Ejercicio 47', async ({ page }) => {
+        const productos = await page.locator('.inventory_item').all();
+        const caros: string[] = [];
+
+        for (const prod of productos) {
+            // Leemos el precio, p. ej. "$29.99", y lo convertimos a número
+            const textoPrecio = await prod.locator('.inventory_item_price').innerText();
+            const precio = parseFloat(textoPrecio.replace('$', ''));
+
+            if (precio > 20) {
+                // Confirmamos su presencia (que está visible en el catálogo)
+                await expect(prod).toBeVisible();
+                caros.push(await prod.locator('.inventory_item_name').innerText());
+            }
+        }
+
+        console.log('Productos > $20:', caros);
+        expect(caros.length).toBeGreaterThan(0);
+    });
+
+});

@@ -16,6 +16,7 @@
     "test:login": "npx playwright test --ui --grep @formCheckout1",
     "test:login": "npx playwright test --ui --grep @formCheckout2",
     "test:login": "npx playwright test --ui --grep @menuLateral",
+    "test:login": "npx playwright test --ui --grep @collecciones",
     "test:report": "npx playwright show-report",
     "testReport": "npx playwright test && npx playwright show-report"
   },
