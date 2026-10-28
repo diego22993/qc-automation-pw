@@ -1,13 +1,5 @@
-# ------------------------------------------------------------
-# OS files
-# ------------------------------------------------------------
-.DS_Store
-Thumbs.db
-Desktop.ini
-*.swp
-*.swo
-*~
 
+<<<<<<< HEAD
 # ------------------------------------------------------------
 # Editor / IDE files
 # ------------------------------------------------------------
@@ -106,6 +98,11 @@ desktop.ini
 
 # Playwright
 node_modules/
+=======
+# Playwright
+node_modules/
+/test-results/
+>>>>>>> ee283be91ac4b64a5af31bbb8f8a3240d5acb188
 /playwright-report/
 /blob-report/
 /playwright/.cache/
