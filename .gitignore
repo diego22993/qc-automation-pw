@@ -110,3 +110,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Explicaciones de ejercicios y validacion local (no publicar)
+/explicaciones-locales/
