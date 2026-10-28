@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login', '@inicial'] }, () => {
+test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login', '@básico'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma y verificación de URL
@@ -55,7 +55,7 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login', '@inicial
 
 });
 
-test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario', '@inicial'] }, () => {
+test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario', '@básico'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
@@ -116,7 +116,7 @@ test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario',
 
 });
 
-test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito', '@inicial'] }, () => {
+test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito', '@básico'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
@@ -158,7 +158,7 @@ test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito', '@ini
 
 });
 
-test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@checkout-one', '@inicial'] }, () => {
+test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@checkout-one', '@básico'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
@@ -212,7 +212,7 @@ test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@check
 
 });
 
-test.describe('Ejercicios en Checkout-step-two - Nivel básico', { tag: ['@checkout-two', '@inicial'] }, () => {
+test.describe('Ejercicios en Checkout-step-two - Nivel básico', { tag: ['@checkout-two', '@básico'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
