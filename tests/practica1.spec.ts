@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('LOGIN.HTML: Nivel Basico', () => {
+test.describe('LOGIN.HTML: Nivel Basico', { tag: ['@login'] },() => {
     test.beforeEach(async ({ page }) => {
         await page.goto('https://www.saucedemo.com/');
         await expect(page).toHaveURL('https://www.saucedemo.com/');
@@ -38,7 +38,7 @@ test.describe('LOGIN.HTML: Nivel Basico', () => {
 
 });
 
-test.describe('INVENTARIO.HTML: Nivel Basico', () => {
+test.describe('INVENTARIO.HTML: Nivel Basico',{ tag: ['@inventory'] }, () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('https://www.saucedemo.com/');
         await expect(page).toHaveURL('https://www.saucedemo.com/');
@@ -72,7 +72,7 @@ test.describe('INVENTARIO.HTML: Nivel Basico', () => {
 
 });
 
-test.describe('CART.HTML: Nivel Basico', () => {
+test.describe('CART.HTML: Nivel Basico',{ tag: ['@cart'] }, () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('https://www.saucedemo.com/');
         await expect(page).toHaveURL('https://www.saucedemo.com/');
@@ -97,7 +97,7 @@ test.describe('CART.HTML: Nivel Basico', () => {
 
 });
 
-test.describe('CHECKOUT-STEP-ONE.HTML: Nivel Basico', () => {
+test.describe('CHECKOUT-STEP-ONE.HTML: Nivel Basico',{ tag: ['@checkout-one'] }, () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('https://www.saucedemo.com/');
         await expect(page).toHaveURL('https://www.saucedemo.com/');
@@ -125,7 +125,7 @@ test.describe('CHECKOUT-STEP-ONE.HTML: Nivel Basico', () => {
     }); 
 });
 
-test.describe('CHECKOUT-STEP-TWO.HTML: Nivel Basico', () => {
+test.describe('CHECKOUT-STEP-TWO.HTML: Nivel Basico',{ tag: ['@checkout-two'] }, () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('https://www.saucedemo.com/');
         await expect(page).toHaveURL('https://www.saucedemo.com/');
