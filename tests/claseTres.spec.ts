@@ -46,21 +46,56 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
 
     test('Ejercicio 6', async ({ page }) => {
         // Descripción: (CSS Selector ID): Completa el campo de contraseña usando su ID #password y presiona el botón #login-button.
+
         await page.locator('#password').fill('secret_sauce');
         await page.locator('#login-button').click();
         await page.pause();
     });
 
-
 });
 
 test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario'] }, () => {
-    test('Ejercicio 7', async ({ page }) => { });
-    test('Ejercicio 8', async ({ page }) => { });
-    test('Ejercicio 9', async ({ page }) => { });
-    test('Ejercicio 10', async ({ page }) => { });
-    test('Ejercicio 11', async ({ page }) => { });
-    test('Ejercicio 12', async ({ page }) => { });
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
+
+    test('Ejercicio 7', async ({ page }) => {
+        // Descripción: (getByRole - Heading): Tras iniciar sesión, verifica que exista un encabezado de nivel 1 o título visible con el texto "Swag Labs".
+        await expect(page.getByText('Swag Labs', { exact: true })).toBeVisible();
+        
+        await expect(page.getByRole('heading', { level: 1 })).toHaveCount(0);
+    });
+
+    test('Ejercicio 8', async ({ page }) => {
+        // Descripción: 
+    });
+
+    test('Ejercicio 9', async ({ page }) => {
+        // Descripción: 
+    });
+
+    test('Ejercicio 10', async ({ page }) => {
+        // Descripción: 
+    });
+
+    test('Ejercicio 11', async ({ page }) => {
+        // Descripción: 
+    });
+
+    test('Ejercicio 12', async ({ page }) => {
+        // Descripción: 
+    });
+
 });
 
 test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito'] }, () => {
