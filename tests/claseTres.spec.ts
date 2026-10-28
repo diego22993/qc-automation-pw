@@ -11,8 +11,9 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
     test('Ejercicio 1', async ({ page }) => {
         // Descripción: (getByPlaceholder): Completa el campo de usuario escribiendo standard_user identificándolo por su placeholder.
 
-        await page.getByPlaceholder('Username').fill('standard_user');
-        await page.pause();
+        const username = page.getByPlaceholder('Username');
+        await username.fill('standard_user');
+        await expect(username).toHaveValue('standard_user');
     });
 
     test('Ejercicio 2', async ({ page }) => {
