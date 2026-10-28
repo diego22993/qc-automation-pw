@@ -73,13 +73,17 @@ test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario']
 
     test('Ejercicio 7', async ({ page }) => {
         // Descripción: (getByRole - Heading): Tras iniciar sesión, verifica que exista un encabezado de nivel 1 o título visible con el texto "Swag Labs".
-        await expect(page.getByText('Swag Labs', { exact: true })).toBeVisible();
 
+        await expect(page.getByText('Swag Labs', { exact: true })).toBeVisible();
         await expect(page.getByRole('heading', { level: 1 })).toHaveCount(0);
     });
 
     test('Ejercicio 8', async ({ page }) => {
-        // Descripción: 
+        // Descripción: (getByText): Encuentra en el catálogo el producto "Sauce Labs Backpack" usando getByText.
+
+        await expect(page.getByText('Sauce Labs Backpack', { exact: true })).toBeVisible();
+
+        // exact: true - El texto tiene que ser todo el contenido del elemento y debe coincidir exactamente.
     });
 
     test('Ejercicio 9', async ({ page }) => {
