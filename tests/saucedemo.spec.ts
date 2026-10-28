@@ -37,6 +37,48 @@ test.describe('SauceDemo - Inventario y carrito', () => {
     await expect(page).toHaveURL('https://www.saucedemo.com/');
     await expect(page.locator('[data-test="login-button"]')).toBeVisible();
   });
+
+  test('Completa el checkout y vuelve al inicio', async ({ page }) => {
+    // 1. Agregar un producto y entrar al carrito
+    await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+    await page.locator('[data-test="shopping-cart-link"]').click();
+    await expect(page).toHaveURL(/cart\.html/);
+
+    // 2. Checkout - datos del comprador
+    await page.locator('[data-test="checkout"]').click();
+    await page.locator('[data-test="firstName"]').fill('Juan');
+    await page.locator('[data-test="lastName"]').fill('Pérez');
+    await page.locator('[data-test="postalCode"]').fill('5000');
+    await page.locator('[data-test="continue"]').click();
+
+    // 3. Resumen y finalizar
+    await expect(page).toHaveURL(/checkout-step-two\.html/);
+    await page.locator('[data-test="finish"]').click();
+    await expect(page.locator('[data-test="complete-header"]')).toHaveText('Thank you for your order!');
+
+    // 4. Volver al inicio
+    await page.locator('[data-test="back-to-products"]').click();
+    await expect(page).toHaveURL(/inventory\.html/);
+    await expect(page.locator('[data-test="title"]')).toHaveText('Products');
+    await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveCount(0);
+  });
+
+  test('No permite continuar el checkout sin código postal', async ({ page }) => {
+    // 1. Agregar un producto e ir al checkout
+    await page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
+    await page.locator('[data-test="shopping-cart-link"]').click();
+    await page.locator('[data-test="checkout"]').click();
+    await expect(page).toHaveURL(/checkout-step-one\.html/);
+
+    // 2. Completar nombre y apellido, dejar vacío el código postal
+    await page.locator('[data-test="firstName"]').fill('Juan');
+    await page.locator('[data-test="lastName"]').fill('Pérez');
+    await page.locator('[data-test="continue"]').click();
+
+    // 3. Se muestra el error y no avanza al paso 2
+    await expect(page.locator('[data-test="error"]')).toHaveText('Error: Postal Code is required');
+    await expect(page).toHaveURL(/checkout-step-one\.html/);
+  });
 });
 
 test('Usuario bloqueado no puede iniciar sesión', async ({ page }) => {
