@@ -35,8 +35,7 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
         // Descripción: (getByText): Intenta ingresar sin credenciales y valida que se muestre el texto de error "Epic sadface: Username is required".
 
         await page.getByRole('button', { name: 'Login' }).click();
-        await page.getByText('Epic sadface: Username is required').isVisible();
-        await page.pause();
+        await expect(page.getByText('Epic sadface: Username is required')).toBeVisible();
     });
 
     test('Ejercicio 5', async ({ page }) => {
