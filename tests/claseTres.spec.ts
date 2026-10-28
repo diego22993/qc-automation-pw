@@ -28,7 +28,7 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
         // Descripción: (getByRole): Haz clic en el botón de login usando getByRole(button, { name: Login }).
 
         await page.getByRole('button', { name: 'Login' }).click();
-        await page.pause();
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
     });
 
     test('Ejercicio 4', async ({ page }) => {
