@@ -56,6 +56,7 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
 });
 
 test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario'] }, () => {
+
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
         await page.goto('https://www.saucedemo.com/');
@@ -116,9 +117,45 @@ test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario']
 });
 
 test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito'] }, () => {
-    test('Ejercicio 13', async ({ page }) => { });
-    test('Ejercicio 14', async ({ page }) => { });
-    test('Ejercicio 15', async ({ page }) => { });
+
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+
+        // Ingresar al carrito
+        await page.getByRole('button', { name: 'Cart, empty' }).click();
+
+        // Verificar ubicación en Carrito
+        await expect(page).toHaveURL(/.*cart.html/);
+    });
+
+    test('Ejercicio 13', async ({ page }) => {
+        // Descripción: (getByText): En /cart.html, verifica la presencia del título de columna "QTY".
+
+        await expect(page.getByText('QTY', { exact: true })).toBeVisible();
+    });
+
+    test('Ejercicio 14', async ({ page }) => {
+        // Descripción: (getByText): En /cart.html, verifica la presencia del título de columna "Description".
+
+        await expect(page.getByText('Description', { exact: true })).toBeVisible();
+    });
+
+    test('Ejercicio 15', async ({ page }) => {
+        // Descripción: (getByRole): Ubica el botón "Continue Shopping" usando getByRole por su nombre accesible.
+
+        await expect(page.getByRole('button', { name: 'Continue Shopping', exact: true })).toBeVisible();
+    });
+
 });
 
 test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@checkout-one'] }, () => {
