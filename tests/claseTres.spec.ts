@@ -11,9 +11,8 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
     test('Ejercicio 1', async ({ page }) => {
         // Descripción: (getByPlaceholder): Completa el campo de usuario escribiendo standard_user identificándolo por su placeholder.
 
-        const username = page.getByPlaceholder('Username');
-        await username.fill('standard_user');
-        await expect(username).toHaveValue('standard_user');
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await expect(page.getByPlaceholder('Username')).toHaveValue('standard_user');
     });
 
     test('Ejercicio 2', async ({ page }) => {
@@ -110,7 +109,7 @@ test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario']
         // Descripción: (.nth()): Selecciona el segundo producto de la lista (índice 1) y haz clic en la imagen del producto.
 
         // Cuando un locator encuentra varios elementos, .nth(i) se queda con uno solo según su posición. El índice empieza en 0.
-        await page.locator('[data-test="inventory-item"]').nth(1).getByRole('img').click(); 
+        await page.locator('[data-test="inventory-item"]').nth(1).getByRole('img').click();
         await expect(page).toHaveURL(/inventory-item\.html/);
     });
 
