@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => {
+test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login', '@inicial'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma y verificación de URL
@@ -55,7 +55,7 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
 
 });
 
-test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario'] }, () => {
+test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario', '@inicial'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
@@ -116,7 +116,7 @@ test.describe('Ejercicios en Inventario - Nivel básico', { tag: ['@inventario']
 
 });
 
-test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito'] }, () => {
+test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito', '@inicial'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
@@ -158,7 +158,7 @@ test.describe('Ejercicios en Carrito - Nivel básico', { tag: ['@carrito'] }, ()
 
 });
 
-test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@checkout-one'] }, () => {
+test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@checkout-one', '@inicial'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
@@ -212,7 +212,7 @@ test.describe('Ejercicios en Checkout-step-one - Nivel básico', { tag: ['@check
 
 });
 
-test.describe('Ejercicios en Checkout-step-two - Nivel básico', { tag: ['@checkout-two'] }, () => {
+test.describe('Ejercicios en Checkout-step-two - Nivel básico', { tag: ['@checkout-two', '@inicial'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
@@ -269,7 +269,7 @@ test.describe('Ejercicios en Checkout-step-two - Nivel básico', { tag: ['@check
 
 });
 
-test.describe('Ejercicios en Login e Inventario - Nivel intermedio', { tag: ['@LoginInventario'] }, () => {
+test.describe('Ejercicios en Login e Inventario - Nivel intermedio', { tag: ['@LoginInventario', '@intermedio'] }, () => {
 
     test.beforeEach(async ({ page }) => {
         // Ingreso a la plataforma
@@ -327,20 +327,20 @@ test.describe('Ejercicios en Login e Inventario - Nivel intermedio', { tag: ['@L
 
 });
 
-test.describe('Ejercicios en Carrito y Navegación - Nivel intermedio', { tag: ['@carrito'] }, () => {
+test.describe('Ejercicios en Carrito y Navegación - Nivel intermedio', { tag: ['@carrito', '@intermedio'] }, () => {
     test('Ejercicio 28', async ({ page }) => { });
     test('Ejercicio 29', async ({ page }) => { });
     test('Ejercicio 30', async ({ page }) => { });
     test('Ejercicio 31', async ({ page }) => { });
 });
 
-test.describe('Ejercicios en Checkout-step-one - Nivel intermedio', { tag: ['@checkout-one'] }, () => {
+test.describe('Ejercicios en Checkout-step-one - Nivel intermedio', { tag: ['@checkout-one', '@intermedio'] }, () => {
     test('Ejercicio 32', async ({ page }) => { });
     test('Ejercicio 33', async ({ page }) => { });
     test('Ejercicio 34', async ({ page }) => { });
 });
 
-test.describe('Ejercicios en Checkout-step-two - Nivel intermedio', { tag: ['@checkout-two'] }, () => {
+test.describe('Ejercicios en Checkout-step-two - Nivel intermedio', { tag: ['@checkout-two', '@intermedio'] }, () => {
     test('Ejercicio 35', async ({ page }) => { });
     test('Ejercicio 36', async ({ page }) => { });
     test('Ejercicio 37', async ({ page }) => { });
@@ -349,21 +349,21 @@ test.describe('Ejercicios en Checkout-step-two - Nivel intermedio', { tag: ['@ch
     test('Ejercicio 40', async ({ page }) => { });
 });
 
-test.describe('Ejercicios en Menú lateral y Accesibilidad - Nivel avanzado', { tag: ['@menu-accessibility'] }, () => {
+test.describe('Ejercicios en Menú lateral y Accesibilidad - Nivel avanzado', { tag: ['@menu-accessibility', '@avanzado'] }, () => {
     test('Ejercicio 41', async ({ page }) => { });
     test('Ejercicio 42', async ({ page }) => { });
     test('Ejercicio 43', async ({ page }) => { });
 
 });
 
-test.describe('Ejercicios en Manipulación avanzada de colecciones - Nivel avanzado', { tag: ['@collection-manipulation'] }, () => {
+test.describe('Ejercicios en Manipulación avanzada de colecciones - Nivel avanzado', { tag: ['@collection-manipulation', '@avanzado'] }, () => {
     test('Ejercicio 44', async ({ page }) => { });
     test('Ejercicio 45', async ({ page }) => { });
     test('Ejercicio 46', async ({ page }) => { });
     test('Ejercicio 47', async ({ page }) => { });
 });
 
-test.describe('Ejercicios en Validación estricta end-to-end (E2E) por pantallas', { tag: ['@e2e-validation'] }, () => {
+test.describe('Ejercicios en Validación estricta end-to-end (E2E) por pantallas', { tag: ['@e2e-validation', '@avanzado'] }, () => {
     test('Ejercicio 48', async ({ page }) => { });
     test('Ejercicio 49', async ({ page }) => { });
     test('Ejercicio 50', async ({ page }) => { });
@@ -371,7 +371,7 @@ test.describe('Ejercicios en Validación estricta end-to-end (E2E) por pantallas
     test('Ejercicio 52', async ({ page }) => { });
 });
 
-test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { tag: ['@full-flows'] }, () => {
+test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { tag: ['@full-flows', '@avanzado'] }, () => {
     test('Ejercicio 53', async ({ page }) => { });
     test('Ejercicio 54', async ({ page }) => { });
     test('Ejercicio 55', async ({ page }) => { });
