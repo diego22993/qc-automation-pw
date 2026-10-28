@@ -51,7 +51,7 @@ test.describe('Ejercicios en Login - Nivel básico', { tag: ['@login'] }, () => 
 
         await page.locator('#password').fill('secret_sauce');
         await page.locator('#login-button').click();
-        await page.pause();
+        await expect(page.getByText('Epic sadface: Username is required')).toBeVisible();
     });
 
 });
