@@ -1059,7 +1059,54 @@ test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { ta
         // Valida que en /checkout-step-two.html el producto presente sea el más caro ($49.99).
         // Finaliza la compra y regresa a la pantalla principal comprobando que el carrito quede limpio.
 
+        // 1. Inicio de sesión: en el beforeEach
 
+        // 2. Ordenar por precio de menor a mayor
+        const ordenar = page.getByRole('combobox', { name: 'Sort products' });
+        await ordenar.selectOption('lohi');
+        await expect(ordenar).toHaveValue('lohi');
+
+        // 3. Agregar el más barato (.first()) y el más caro (.last())
+        const productos = page.locator('[data-test="inventory-item"]');
+        await expect(productos.first().locator('[data-test="inventory-item-price"]')).toHaveText('$7.99'); // Verificar orden correcto
+        await productos.first().getByRole('button', { name: 'Add to cart' }).click();
+        await productos.last().getByRole('button', { name: 'Add to cart' }).click();
+        await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('2');
+
+        // 4. Ir al carrito, eliminar el producto más barato y confirmar que el badge indique "1"
+        await page.getByRole('button', { name: /^Cart/ }).click();
+        await expect(page).toHaveURL(/cart\.html/);
+
+        await page.locator('.cart_item')
+            .filter({ hasText: '$7.99' })
+            .getByRole('button', { name: 'Remove' })
+            .click();
+        await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('1');
+
+        // 5. Completar el formulario de checkout
+        await page.getByRole('button', { name: 'Checkout' }).click();
+        await expect(page).toHaveURL(/checkout-step-one\.html/);
+
+        await page.getByPlaceholder('First Name').fill('Azul');
+        await page.getByPlaceholder('Last Name').fill('Vela');
+        await page.getByPlaceholder('Zip/Postal Code').fill('1234');
+        await page.getByRole('button', { name: 'Continue' }).click();
+        await expect(page).toHaveURL(/checkout-step-two\.html/);
+
+        // 6. Validar que el único producto es el más caro
+        const items = page.locator('.cart_item');
+        await expect(items).toHaveCount(1);
+        await expect(items.locator('[data-test="inventory-item-price"]')).toHaveText('$49.99');
+
+        // 7. Finalizar la compra
+        await page.getByRole('button', { name: 'Finish' }).click();
+        await expect(page).toHaveURL(/checkout-complete\.html/);
+        await expect(page.getByRole('heading', { name: 'Thank you for your order!', level: 2 })).toBeVisible();
+
+        // 8. Volver a la pantalla principal y comprobar que el carrito este limpio
+        await page.getByRole('button', { name: 'Back Home' }).click();
+        await expect(page).toHaveURL(/inventory\.html/);
+        await expect(page.locator('[data-test="shopping-cart-badge"]')).toBeHidden();
     });
 
 });
