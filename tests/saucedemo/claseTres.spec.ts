@@ -585,9 +585,53 @@ test.describe('Ejercicios en Checkout-step-two - Nivel intermedio', { tag: ['@ch
 });
 
 test.describe('Ejercicios en Menú lateral y Accesibilidad - Nivel avanzado', { tag: ['@menu', '@avanzado'] }, () => {
-    test('Ejercicio 41', async ({ page }) => { });
-    test('Ejercicio 42', async ({ page }) => { });
-    test('Ejercicio 43', async ({ page }) => { });
+
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
+
+    test('Ejercicio 41', async ({ page }) => {
+        // Descripción: (Menú Hamburguesa): En /inventory.html, abre el menú lateral haciendo clic en el botón con ID #react-burger-menu-btn.
+
+        await page.locator('#react-burger-menu-btn').click();
+
+        // El contenedor del menú se ve y el estado accesible cambió
+        await expect(page.locator('.bm-menu-wrap')).toBeVisible();
+        await expect(page.locator('.bm-menu-wrap')).toHaveAttribute('aria-hidden', 'false');
+    });
+
+    test('Ejercicio 42', async ({ page }) => {
+        // Descripción: (Logout vía Menú): Abre el menú lateral, espera a que los enlaces sean visibles y haz clic en el enlace "Logout" con getByRole('link', { name: 'Logout' }).
+
+        await page.locator('#react-burger-menu-btn').click();
+        await expect(page.locator('.bm-item-list a').filter({ visible: true })).toHaveCount(5);
+        await page.getByRole('button', { name: 'Logout' }).click();
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+    });
+
+    test('Ejercicio 43', async ({ page }) => {
+        // Descripción: (Reset App State): Abre el menú lateral y haz clic en la opción "Reset App State" para limpiar los elementos del carrito.
+
+        // Agregar producto al carrito
+        await page.getByRole('button', { name: 'Add to Cart' }).first().click();
+
+        // Abrir menú
+        await page.locator('#react-burger-menu-btn').click();
+
+        // Limpiar el carrito y verificar que este vacío
+        await page.locator('#reset_sidebar_link').click();
+        await expect(page.locator('[data-test="shopping-cart-link"]')).toHaveAttribute('aria-label', 'Cart, empty');
+    });
 
 });
 
