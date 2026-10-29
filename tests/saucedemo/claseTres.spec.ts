@@ -965,7 +965,31 @@ test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { ta
         // Descripción: (E2E Cancelación en Checkout Paso 2): Inicia un flujo de compra hasta /checkout-step-two.html, presiona el botón "Cancel" 
         // y verifica el retorno a /inventory.html.
 
+        // Pantalla 2: /inventory.html
+        await page.locator('[data-test="inventory-item"]')
+            .filter({ hasText: 'Sauce Labs Backpack' })
+            .getByRole('button', { name: 'Add to cart' })
+            .click();
 
+        await page.getByRole('button', { name: /^Cart/ }).click();
+
+        // Pantalla 3: /cart.html
+        await expect(page).toHaveURL(/cart\.html/);
+        await page.getByRole('button', { name: 'Checkout' }).click();
+
+        // Pantalla 4: /checkout-step-one.html
+        await expect(page).toHaveURL(/checkout-step-one\.html/);
+        await page.getByPlaceholder('First Name').fill('Azul');
+        await page.getByPlaceholder('Last Name').fill('Vela');
+        await page.getByPlaceholder('Zip/Postal Code').fill('1234');
+        await page.getByRole('button', { name: 'Continue' }).click();
+
+        // Pantalla 5: /checkout-step-two.html
+        await expect(page).toHaveURL(/checkout-step-two\.html/);
+
+        // Cancelar y verificar el retorno al inventario
+        await page.getByRole('button', { name: 'Cancel' }).click();
+        await expect(page).toHaveURL(/inventory\.html/);
     });
 
     test('Ejercicio 58', async ({ page }) => {
