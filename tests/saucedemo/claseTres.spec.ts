@@ -812,16 +812,15 @@ test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { ta
         // Pantalla 2: /inventory.html
         await page.locator('[data-test="inventory-item"]').getByRole('button', { name: 'Add to cart' }).first().click();
         await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('1');
+        await page.getByRole('button', { name: /^Cart/ }).click();
 
         // Pantalla 3: /cart.html
-        await page.getByRole('button', { name: /^Cart/ }).click();
         await expect(page).toHaveURL(/cart\.html/);
         await expect(page.locator('.cart_item')).toHaveCount(1);
+        await page.getByRole('button', { name: 'Checkout' }).click();
 
         // Pantalla 4: /checkout-step-one.html
-        await page.getByRole('button', { name: 'Checkout' }).click();
         await expect(page).toHaveURL(/checkout-step-one\.html/);
-
         await page.getByPlaceholder('First Name').fill('Azul');
         await page.getByPlaceholder('Last Name').fill('Vela');
         await page.getByPlaceholder('Zip/Postal Code').fill('1234');
@@ -840,7 +839,37 @@ test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { ta
         // Descripción: (E2E Compra Múltiple): Agrega 3 productos específicos con .filter(), valida sus nombres en /cart.html, completa el checkout 
         // y confirma el mensaje final.
 
+        // Pantalla 2: /inventory.html
+        const productos = ['Sauce Labs Backpack', 'Sauce Labs Bike Light', 'Sauce Labs Onesie'];
 
+        for (const nombre of productos) {
+            await page.locator('[data-test="inventory-item"]')
+                .filter({ hasText: nombre })
+                .getByRole('button', { name: 'Add to cart' })
+                .click();
+        }
+        await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('3');
+        await page.getByRole('button', { name: /^Cart/ }).click();
+
+        // Pantalla 3: /cart.html
+        await expect(page).toHaveURL(/cart\.html/);
+        await expect(page.locator('.cart_item [data-test="inventory-item-name"]')).toHaveText(productos);
+        await page.getByRole('button', { name: 'Checkout' }).click();
+
+        // Pantalla 4: /checkout-step-one.html
+        await expect(page).toHaveURL(/checkout-step-one\.html/);
+        await page.getByPlaceholder('First Name').fill('Azul');
+        await page.getByPlaceholder('Last Name').fill('Vela');
+        await page.getByPlaceholder('Zip/Postal Code').fill('1234');
+        await page.getByRole('button', { name: 'Continue' }).click();
+
+        // Pantalla 5: /checkout-step-two.html
+        await expect(page).toHaveURL(/checkout-step-two\.html/);
+        await page.getByRole('button', { name: 'Finish' }).click();
+
+        // Pantalla 6: /checkout-complete.html
+        await expect(page).toHaveURL(/checkout-complete\.html/);
+        await expect(page.getByRole('heading', { name: 'Thank you for your order!', level: 2 })).toBeVisible();
     });
 
     test('Ejercicio 55', async ({ page }) => {
