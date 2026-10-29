@@ -7,13 +7,13 @@ export class BookingSearchPage extends BookingBasePage {
     private datePickerOpenBtn: Locator;
     private datePickerHasta: Locator;
     private guestsOccupancyBtn: Locator;
-    private firstAutocompleteResult: Locator;
+    private autocompleteResults: Locator;
     private datePickerCalendar: Locator;
 
     constructor(page: Page) {
         super(page);
         this.destinationInput = page.locator('input[name="ss"]');
-        this.firstAutocompleteResult = page.locator('[data-testid="autocomplete-result"]').first();
+        this.autocompleteResults = page.locator('[data-testid="autocomplete-result"]');
         this.datePickerCalendar = page.locator('[data-testid="searchbox-datepicker-calendar"]');
         this.searchButton = page.locator('button[type="submit"]');
         this.datePickerOpenBtn = page.locator('[data-testid="date-display-field-start"]');
@@ -25,14 +25,23 @@ export class BookingSearchPage extends BookingBasePage {
         await this.navigateTo('https://www.booking.com');
     }
 
-    async searchDestination(destination: string, checkInDate: string, checkOutDate: string) {
+    async searchDestination(destination: string) {
         await this.typeText(this.destinationInput, destination);
-        await this.clickElement(this.firstAutocompleteResult); // Click en la primer sugerencia.
-        
+        // Esperamos una sugerencia que contenga el destino.
+        const destinationResult = this.autocompleteResults.filter({ hasText: destination }).first();
+        await this.clickElement(destinationResult);
+    }
+
+
+    async searchDate(checkInDate: string, checkOutDate: string) {
         await this.selectDate(checkInDate);
         await this.selectDate(checkOutDate);
+    }
 
+    async clickSearch() {
+        await this.page.waitForTimeout(5000);
         await this.clickElement(this.searchButton);
+        await this.page.waitForTimeout(5000);
     }
 
     private async selectDate(dateIso: string) {

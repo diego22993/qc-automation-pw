@@ -29,7 +29,7 @@ export class BookingBasePage {
         const modalCloseButton = cookiesAcceptButton.or(signInCloseButton);
         try {
             // isVisible no espera, por eso usamos waitFor
-            await modalCloseButton.first().waitFor({ state: 'visible', timeout: 10000 });
+            await modalCloseButton.first().waitFor({ state: 'visible', timeout: 100000 });
             await modalCloseButton.first().click();
             console.log('Modal cerrado.');
         }
