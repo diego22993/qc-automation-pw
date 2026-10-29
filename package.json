@@ -3,12 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:booking": "npx playwright test --ui --grep @booking",
+    "debug:booking": "npx playwright test --debug --grep @booking"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.64.0",
-    "@types/node": "^26.6.4"
+    "@types/node": "^26.6.6"
   }
 }

@@ -1,7 +1,3 @@
-
-
-
-
 import { Page, Locator } from '@playwright/test';
 import { BookingBasePage } from './BookingBasePage';
 
@@ -14,7 +10,8 @@ export class BookingSearchPage extends BookingBasePage {
   constructor(page: Page) {
     super(page);
     this.destinationInput = page.locator('input[name="ss"]');
-    this.searchButton = page.locator('button[type="submit"]');
+    // Usamos el rol accesible y nombre exacto, o un contenedor padre para evitar ambigüedades
+    this.searchButton = page.getByRole('button', { name: 'Search', exact: true });
     this.datePickerOpenBtn = page.locator('[data-testid="date-display-field-start"]');
     this.guestsOccupancyBtn = page.locator('[data-testid="occupancy-config"]');
   }
@@ -26,10 +23,24 @@ export class BookingSearchPage extends BookingBasePage {
   async searchDestination(destination: string, checkInDate: string, checkOutDate: string) {
     await this.typeText(this.destinationInput, destination);
     
-    // Abrir y seleccionar fechas en el calendario
+    // Manejar el desplegable de sugerencias de manera segura
+    const firstSuggestion = this.page.locator('#autocomplete-result-0, [data-testid="autocomplete-result"] li').first();
+    if (await firstSuggestion.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await firstSuggestion.click();
+    } else {
+      await this.destinationInput.press('ArrowDown');
+      await this.destinationInput.press('Enter');
+    }
+
+    // Abrir el calendario y seleccionar fechas
+    await this.datePickerOpenBtn.waitFor({ state: 'visible' });
     await this.clickElement(this.datePickerOpenBtn);
+
     await this.selectDate(checkInDate);
     await this.selectDate(checkOutDate);
+
+    // Forzar el clic para evitar intercepciones de capas de UI o modales flotantes
+await this.searchButton.click({ force: true });
 
     await this.clickElement(this.searchButton);
   }
