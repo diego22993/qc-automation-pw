@@ -624,6 +624,7 @@ test.describe('Ejercicios en Menú lateral y Accesibilidad - Nivel avanzado', { 
 
         // Agregar producto al carrito
         await page.getByRole('button', { name: 'Add to Cart' }).first().click();
+        await expect(page.locator('[data-test="shopping-cart-link"]')).toHaveAttribute('aria-label', 'Cart, 1 items');
 
         // Abrir menú
         await page.locator('#react-burger-menu-btn').click();
@@ -636,10 +637,33 @@ test.describe('Ejercicios en Menú lateral y Accesibilidad - Nivel avanzado', { 
 });
 
 test.describe('Ejercicios en Manipulación avanzada de colecciones - Nivel avanzado', { tag: ['@collection-manipulation', '@avanzado'] }, () => {
-    test('Ejercicio 44', async ({ page }) => { });
-    test('Ejercicio 45', async ({ page }) => { });
-    test('Ejercicio 46', async ({ page }) => { });
-    test('Ejercicio 47', async ({ page }) => { });
+
+
+
+    test('Ejercicio 44', async ({ page }) => {
+        // Descripción: (.nth() e Iteración): Selecciona el 1.o, 3.o y 5.o producto del catálogo usando .nth(0), .nth(2) y .nth(4), agregándolos al carrito.
+
+
+    });
+
+    test('Ejercicio 45', async ({ page }) => {
+        // Descripción: (.filter() por Sub-elemento): En /inventory.html, filtra los elementos .inventory_item que contengan un botón con el texto "Add to cart" y valida cuántos quedan sin agregar.
+
+
+    });
+
+    test('Ejercicio 46', async ({ page }) => {
+        // Descripción: (Verificación de Conteo Dinámico): Agrega 4 productos al carrito, navega a /cart.html y valida estrictamente con expect(page.locator('.cart_item')).toHaveCount(4).
+
+
+    });
+
+    test('Ejercicio 47', async ({ page }) => {
+        // Descripción: (Validación Múltiple de Precios): Recorre el catálogo filtrando los productos con precio mayor a $20 y confirma su presencia.
+
+
+    });
+
 });
 
 test.describe('Ejercicios en Validación estricta end-to-end (E2E) por pantallas', { tag: ['@e2e-validation', '@avanzado'] }, () => {
