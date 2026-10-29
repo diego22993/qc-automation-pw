@@ -876,7 +876,49 @@ test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { ta
         /* Descripción: (E2E Modificación de Carrito en Paso Intermedio): Agrega 2 productos, ve al carrito, elimina 1
         producto con .filter(), procede al checkout y completa la compra de 1 solo ítem. */
 
+        // Pantalla 2: /inventory.html 
+        const productos = page.locator('[data-test="inventory-item"]');
 
+        // Agregar el primero y el último producto
+        await productos.first().getByRole('button', { name: 'Add to cart' }).click();
+        await productos.last().getByRole('button', { name: 'Add to cart' }).click();
+        await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('2');
+
+        // Ir al carrito
+        await page.getByRole('button', { name: /^Cart/ }).click();
+
+        // Pantalla 3: /cart.html
+        await expect(page).toHaveURL(/cart\.html/);
+        const items = page.locator('.cart_item');
+        await expect(items).toHaveCount(2);
+
+        // Eliminar el último
+        await items.last().getByRole('button', { name: 'Remove' }).click();
+        await expect(items).toHaveCount(1);
+        await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('1');
+
+        // Continuar
+        await page.getByRole('button', { name: 'Checkout' }).click();
+
+        // Pantalla 4: /checkout-step-one.html
+        await expect(page).toHaveURL(/checkout-step-one\.html/);
+        await page.getByPlaceholder('First Name').fill('Azul');
+        await page.getByPlaceholder('Last Name').fill('Vela');
+        await page.getByPlaceholder('Zip/Postal Code').fill('1234');
+
+        // Continuar
+        await page.getByRole('button', { name: 'Continue' }).click();
+
+        // Pantalla 5: /checkout-step-two.html
+        await expect(page).toHaveURL(/checkout-step-two\.html/);
+        await expect(page.locator('.cart_item')).toHaveCount(1);
+
+        // Finalizar
+        await page.getByRole('button', { name: 'Finish' }).click();
+
+        // Pantalla 6: /checkout-complete.html
+        await expect(page).toHaveURL(/checkout-complete\.html/);
+        await expect(page.getByRole('heading', { name: 'Thank you for your order!', level: 2 })).toBeVisible();
     });
 
     test('Ejercicio 56', async ({ page }) => {
