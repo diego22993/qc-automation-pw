@@ -32,7 +32,6 @@ export class BookingSearchPage extends BookingBasePage {
         await this.clickElement(destinationResult);
     }
 
-
     async searchDate(checkInDate: string, checkOutDate: string) {
         await this.selectDate(checkInDate);
         await this.selectDate(checkOutDate);

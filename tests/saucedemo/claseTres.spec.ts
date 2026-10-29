@@ -545,37 +545,46 @@ test.describe('Ejercicios en Checkout-step-two - Nivel intermedio', { tag: ['@ch
     test('Ejercicio 35', async ({ page }) => {
         // Descripción: (Resumen Financiero - Item Total): En /checkout-step-two.html, ubica el elemento .summary_subtotal_label y verifica que contenga el prefijo "Item total:".
 
-        
+        await expect(page.locator('.summary_subtotal_label')).toHaveText(/^Item total:/); // ^ significa “empieza con”
     });
 
     test('Ejercicio 36', async ({ page }) => {
         // Descripción: (Resumen Financiero - Impuestos): Valida la visibilidad del texto de impuesto .summary_tax_label.
 
+        await expect(page.locator('.summary_tax_label')).toContainText("Tax: $");
     });
 
     test('Ejercicio 37', async ({ page }) => {
         // Descripción: (Resumen Financiero - Total Final): Valida que el selector .summary_total_label esté visible.
 
+        await expect(page.locator('.summary_total_label')).toBeVisible();
     });
 
     test('Ejercicio 38', async ({ page }) => {
         // Descripción: (Confirmación de Envío): En /checkout-step-two.html, presiona el botón "Finish" usando getByRole('button', { name: 'Finish' }).
 
+        await page.getByRole('button', { name: 'Finish' }).click();
+        await expect(page).toHaveURL(/checkout-complete.html/);
     });
 
     test('Ejercicio 39', async ({ page }) => {
         // Descripción: (Texto Descriptivo de Confirmación): En /checkout-complete.html, valida el texto secundario "Your order has been dispatched".
 
+        await page.getByRole('button', { name: 'Finish' }).click();
+        await expect(page.getByRole('heading', { name: 'Thank you for your order!', level: 2 })).toBeVisible();
     });
 
     test('Ejercicio 40', async ({ page }) => {
         // Descripción: (Botón Regreso al Inicio): En /checkout-complete.html, presiona el botón "Back Home" y confirma el retorno a /inventory.html.
 
+        await page.getByRole('button', { name: 'Finish' }).click();
+        await page.getByRole('button', { name: 'Back Home' }).click();
+        await expect(page).toHaveURL(/inventory.html/);
     });
 
 });
 
-test.describe('Ejercicios en Menú lateral y Accesibilidad - Nivel avanzado', { tag: ['@menu-accessibility', '@avanzado'] }, () => {
+test.describe('Ejercicios en Menú lateral y Accesibilidad - Nivel avanzado', { tag: ['@menu', '@avanzado'] }, () => {
     test('Ejercicio 41', async ({ page }) => { });
     test('Ejercicio 42', async ({ page }) => { });
     test('Ejercicio 43', async ({ page }) => { });
