@@ -791,37 +791,103 @@ test.describe('Ejercicios en Validación estricta end-to-end (E2E) por pantallas
 
 test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { tag: ['@full-flows', '@avanzado'] }, () => {
 
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
 
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
 
     test('Ejercicio 53', async ({ page }) => {
+        /* Descripción: (E2E Compra Simple de 1 Producto): Realiza la compra de 1 producto navegando secuencialmente
+        por las 6 pantallas (/ /inventory.html /cart.html /checkout-step-one.html /checkout-step-two.html /checkout-complete.html). */
 
+        // Pantalla 2: /inventory.html
+        await page.locator('[data-test="inventory-item"]').getByRole('button', { name: 'Add to cart' }).first().click();
+        await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('1');
+
+        // Pantalla 3: /cart.html
+        await page.getByRole('button', { name: /^Cart/ }).click();
+        await expect(page).toHaveURL(/cart\.html/);
+        await expect(page.locator('.cart_item')).toHaveCount(1);
+
+        // Pantalla 4: /checkout-step-one.html
+        await page.getByRole('button', { name: 'Checkout' }).click();
+        await expect(page).toHaveURL(/checkout-step-one\.html/);
+
+        await page.getByPlaceholder('First Name').fill('Azul');
+        await page.getByPlaceholder('Last Name').fill('Vela');
+        await page.getByPlaceholder('Zip/Postal Code').fill('1234');
+        await page.getByRole('button', { name: 'Continue' }).click();
+
+        // Pantalla 5: /checkout-step-two.html
+        await expect(page).toHaveURL(/checkout-step-two\.html/);
+        await page.getByRole('button', { name: 'Finish' }).click();
+
+        // Pantalla 6: /checkout-complete.html
+        await expect(page).toHaveURL(/checkout-complete\.html/);
+        await expect(page.getByRole('heading', { name: 'Thank you for your order!', level: 2 })).toBeVisible();
     });
 
     test('Ejercicio 54', async ({ page }) => {
+        // Descripción: (E2E Compra Múltiple): Agrega 3 productos específicos con .filter(), valida sus nombres en /cart.html, completa el checkout 
+        // y confirma el mensaje final.
+
 
     });
 
     test('Ejercicio 55', async ({ page }) => {
+        /* Descripción: (E2E Modificación de Carrito en Paso Intermedio): Agrega 2 productos, ve al carrito, elimina 1
+        producto con .filter(), procede al checkout y completa la compra de 1 solo ítem. */
+
 
     });
 
     test('Ejercicio 56', async ({ page }) => {
+        // Descripción: (E2E Intento Fallido de Checkout): Agrega un producto, ve a /checkout-step-one.html, deja el campo Zip en blanco, 
+        // valida el mensaje de error específico, completa el campo faltante y finaliza la compra.
+
 
     });
 
     test('Ejercicio 57', async ({ page }) => {
+        // Descripción: (E2E Cancelación en Checkout Paso 2): Inicia un flujo de compra hasta /checkout-step-two.html, presiona el botón "Cancel" 
+        // y verifica el retorno a /inventory.html.
+
 
     });
 
     test('Ejercicio 58', async ({ page }) => {
+        // Descripción: (E2E Navegación Inversa): Desde /checkout-step-one.html, presiona "Cancel" para volver a /cart.html, luego presiona "Continue Shopping" 
+        // para volver a /inventory.html.
+
 
     });
 
     test('Ejercicio 59', async ({ page }) => {
+        // Descripción: (E2E Verificación de Datos de Pago y Envío): En /checkout-step-two.html, verifica que la información de pago contenga "SauceCard" 
+        // y la información de envío contenga "Free Pony Express Delivery!".
+
 
     });
 
     test('Ejercicio 60', async ({ page }) => {
+        // Descripción: (E2E Máximo Reto Integrador):
+        // Inicia sesión con credenciales válidas.
+        // Ordena los productos por precio de menor a mayor.
+        // Agrega el producto más barato (.first()) y el más caro (.last()).
+        // Ve al carrito, elimina el producto más barato y confirma que el badge indique "1".
+        // Completa el formulario de checkout.
+        // Valida que en /checkout-step-two.html el producto presente sea el más caro ($49.99).
+        // Finaliza la compra y regresa a la pantalla principal comprobando que el carrito quede limpio.
+
 
     });
 
