@@ -996,7 +996,28 @@ test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { ta
         // Descripción: (E2E Navegación Inversa): Desde /checkout-step-one.html, presiona "Cancel" para volver a /cart.html, luego presiona "Continue Shopping" 
         // para volver a /inventory.html.
 
+        // Pantalla 2: /inventory.html
+        await page.locator('[data-test="inventory-item"]')
+            .filter({ hasText: 'Sauce Labs Backpack' })
+            .getByRole('button', { name: 'Add to cart' })
+            .click();
 
+        await page.getByRole('button', { name: /^Cart/ }).click();
+
+        // Pantalla 3: /cart.html
+        await expect(page).toHaveURL(/cart\.html/);
+        await page.getByRole('button', { name: 'Checkout' }).click();
+
+        // Pantalla 4: /checkout-step-one.html
+        await expect(page).toHaveURL(/checkout-step-one\.html/);
+
+        // Cancelar y verificar retorno al carrito
+        await page.getByRole('button', { name: 'Cancel' }).click();
+        await expect(page).toHaveURL(/cart\.html/);
+
+        // Continue Shopping y verificar retorno vuelve al inventario
+        await page.getByRole('button', { name: 'Continue Shopping' }).click();
+        await expect(page).toHaveURL(/inventory\.html/);
     });
 
     test('Ejercicio 59', async ({ page }) => {
