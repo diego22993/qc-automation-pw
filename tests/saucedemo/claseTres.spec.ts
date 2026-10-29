@@ -638,30 +638,82 @@ test.describe('Ejercicios en Menú lateral y Accesibilidad - Nivel avanzado', { 
 
 test.describe('Ejercicios en Manipulación avanzada de colecciones - Nivel avanzado', { tag: ['@collection-manipulation', '@avanzado'] }, () => {
 
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
 
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
 
     test('Ejercicio 44', async ({ page }) => {
         // Descripción: (.nth() e Iteración): Selecciona el 1.o, 3.o y 5.o producto del catálogo usando .nth(0), .nth(2) y .nth(4), agregándolos al carrito.
 
+        await page.locator('[data-test="inventory-item"]').nth(0).getByRole('button', { name: 'Add to cart' }).click();
+        await page.locator('[data-test="inventory-item"]').nth(2).getByRole('button', { name: 'Add to cart' }).click();
+        await page.locator('[data-test="inventory-item"]').nth(4).getByRole('button', { name: 'Add to cart' }).click();
 
+        await expect(page.locator('.shopping_cart_container').locator('.shopping_cart_badge')).toHaveText('3');
     });
 
     test('Ejercicio 45', async ({ page }) => {
         // Descripción: (.filter() por Sub-elemento): En /inventory.html, filtra los elementos .inventory_item que contengan un botón con el texto "Add to cart" y valida cuántos quedan sin agregar.
 
+        // Agregar el primer producto al carrito
+        await page.locator('.inventory_item').first().getByRole('button', { name: 'Add to cart' }).click();
 
+        // Filtrar las tarjetas que todavía tienen un botón "Add to cart"
+        const sinAgregar = page.locator('.inventory_item').filter({ has: page.getByRole('button', { name: 'Add to cart' }) });
+
+        // Filtrar las tarjetas que no tienen "Add to cart"
+        const agregados = page.locator('.inventory_item').filter({ hasNot: page.getByRole('button', { name: 'Add to cart' }) });
+
+        // Quedan 5 sin agregar
+        await expect(sinAgregar).toHaveCount(5);
+        await expect(agregados).toHaveCount(1);
     });
 
     test('Ejercicio 46', async ({ page }) => {
         // Descripción: (Verificación de Conteo Dinámico): Agrega 4 productos al carrito, navega a /cart.html y valida estrictamente con expect(page.locator('.cart_item')).toHaveCount(4).
 
+        const botonesAgregar = page.getByRole('button', { name: 'Add to cart' });
 
+        for (let i = 0; i < 4; i++) {
+            await botonesAgregar.first().click();
+            await expect(botonesAgregar).toHaveCount(6 - i - 1);   // espera a que el botón cambie a "Remove"
+        }
+
+        await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('4');
+
+        // Ingresar al carrito
+        await page.locator('#shopping_cart_container').getByRole('button').click();
+        await expect(page).toHaveURL(/cart\.html/);
+
+        // Validar que hay 4 ítems
+        await expect(page.locator('.cart_item')).toHaveCount(4);
     });
 
     test('Ejercicio 47', async ({ page }) => {
         // Descripción: (Validación Múltiple de Precios): Recorre el catálogo filtrando los productos con precio mayor a $20 y confirma su presencia.
 
+        const nombresLoc = page.locator('[data-test="inventory-item-name"]');
+        const preciosLoc = page.locator('[data-test="inventory-item-price"]');
+        await expect(preciosLoc).toHaveCount(6);   // primero confirmamos que cargaron porque allInnerTexts() no espera
 
+        // Traer todos los nombres y precios en un array cada uno
+        const nombres = await nombresLoc.allInnerTexts();
+        const precios = await preciosLoc.allInnerTexts();
+
+        // Quedarse con los nombres cuyo precio es mayor a 20
+        const caros = nombres.filter((_, i) => parseFloat(precios[i].replace('$', '')) > 20);
+
+        expect(caros).toEqual(['Sauce Labs Backpack', 'Sauce Labs Fleece Jacket']);
     });
 
 });
