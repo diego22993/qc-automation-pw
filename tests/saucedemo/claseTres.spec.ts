@@ -719,20 +719,110 @@ test.describe('Ejercicios en Manipulación avanzada de colecciones - Nivel avanz
 });
 
 test.describe('Ejercicios en Validación estricta end-to-end (E2E) por pantallas', { tag: ['@e2e-validation', '@avanzado'] }, () => {
-    test('Ejercicio 48', async ({ page }) => { });
-    test('Ejercicio 49', async ({ page }) => { });
-    test('Ejercicio 50', async ({ page }) => { });
-    test('Ejercicio 51', async ({ page }) => { });
-    test('Ejercicio 52', async ({ page }) => { });
+
+    test.beforeEach(async ({ page }) => {
+        // Ingreso a la plataforma
+        await page.goto('https://www.saucedemo.com/');
+        await expect(page).toHaveURL('https://www.saucedemo.com/');
+
+        // Login
+        await page.getByPlaceholder('Username').fill('standard_user');
+        await page.getByPlaceholder('Password').fill('secret_sauce');
+        await page.getByRole('button', { name: 'Login' }).click();
+
+        // Verificar ubicación en Inventario
+        await expect(page).toHaveURL(/.*inventory.html/);
+    });
+
+    test('Ejercicio 48', async ({ page }) => {
+        // Descripción: (Detalle de Producto - Navegación): En /inventory.html, haz clic en la imagen de un producto específico usando getByAltText, valida la redirección a /inventory-item.html y confirma el botón "Back to products".
+
+        await page.getByAltText('Sauce Labs Backpack', { exact: true }).click();
+        await expect(page).toHaveURL(/inventory-item\.html/);
+        await expect(page.locator('[data-test="inventory-item-name"]')).toHaveText('Sauce Labs Backpack');
+        await expect(page.getByRole('button', { name: 'Back to products' })).toBeVisible();
+    });
+
+    test('Ejercicio 49', async ({ page }) => {
+        // Descripción: (Remover desde Detalle): Agrega un producto desde su página de detalle /inventory-item.html y confirma que el botón cambie a "Remove".
+
+        await page.getByAltText('Sauce Labs Backpack', { exact: true }).click();
+        await expect(page).toHaveURL(/inventory-item\.html/);
+        await expect(page.locator('[data-test="inventory-item-name"]')).toHaveText('Sauce Labs Backpack');
+        await page.getByRole('button', { name: 'Add to cart' }).click();
+        await expect(page.getByRole('button', { name: 'Remove' })).toBeVisible();
+    });
+
+    test('Ejercicio 50', async ({ page }) => {
+        // Descripción: (Validación de Ordenamiento A-Z vs Z-A): Cambia el ordenamiento a Z-A y verifica que el primer producto de la lista sea "Test.allTheThings() T-Shirt (Red)".
+
+        const ordenar = page.getByRole('combobox', { name: 'Sort products' });
+        const productos = page.locator('[data-test="inventory-item-name"]');
+
+        // Cambiar a Z-A y verificación de producto
+        await ordenar.selectOption('za');
+        await expect(ordenar).toHaveValue('za');
+        await expect(productos.first()).toHaveText('Test.allTheThings() T-Shirt (Red)');
+    });
+
+    test('Ejercicio 51', async ({ page }) => {
+        // Descripción: (Validación de Ordenamiento por Precio Low to High): Cambia el ordenamiento a precio ascendente y confirma mediante encadenamiento que el primer precio sea "$7.99".
+
+        const ordenar = page.getByRole('combobox', { name: 'Sort products' });
+        await ordenar.selectOption('lohi');
+        await expect(ordenar).toHaveValue('lohi');
+
+        // Encadenamiento: primera tarjeta → su precio
+        await expect(page.locator('[data-test="inventory-item"]').first().locator('[data-test="inventory-item-price"]')).toHaveText('$7.99');
+    });
+
+    test('Ejercicio 52', async ({ page }) => {
+        // Descripción: (Validación de Ordenamiento por Precio High to Low): Cambia el ordenamiento a precio descendente y confirma que el primer precio sea "$49.99".
+
+        const ordenar = page.getByRole('combobox', { name: 'Sort products' });
+        await ordenar.selectOption('hilo');
+        await expect(ordenar).toHaveValue('hilo');
+
+        // Encadenamiento: primera tarjeta → su precio
+        await expect(page.locator('[data-test="inventory-item"]').first().locator('[data-test="inventory-item-price"]')).toHaveText('$49.99');
+    });
+
 });
 
 test.describe('Ejercicios en Flujos completos integrales - Nivel avanzado', { tag: ['@full-flows', '@avanzado'] }, () => {
-    test('Ejercicio 53', async ({ page }) => { });
-    test('Ejercicio 54', async ({ page }) => { });
-    test('Ejercicio 55', async ({ page }) => { });
-    test('Ejercicio 56', async ({ page }) => { });
-    test('Ejercicio 57', async ({ page }) => { });
-    test('Ejercicio 58', async ({ page }) => { });
-    test('Ejercicio 59', async ({ page }) => { });
-    test('Ejercicio 60', async ({ page }) => { });
+
+
+
+    test('Ejercicio 53', async ({ page }) => {
+
+    });
+
+    test('Ejercicio 54', async ({ page }) => {
+
+    });
+
+    test('Ejercicio 55', async ({ page }) => {
+
+    });
+
+    test('Ejercicio 56', async ({ page }) => {
+
+    });
+
+    test('Ejercicio 57', async ({ page }) => {
+
+    });
+
+    test('Ejercicio 58', async ({ page }) => {
+
+    });
+
+    test('Ejercicio 59', async ({ page }) => {
+
+    });
+
+    test('Ejercicio 60', async ({ page }) => {
+
+    });
+
 });
