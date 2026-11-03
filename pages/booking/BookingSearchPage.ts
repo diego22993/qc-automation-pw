@@ -53,6 +53,8 @@ export class BookingSearchPage extends BookingBasePage {
     if (checkInDate < localToday || checkOutDate <= checkInDate) {
       throw new Error('El ingreso no puede estar en el pasado y la salida debe ser posterior.');
     }
+    // La vuelta al inicio puede conservar el destino; cambiarlo fuerza nuevas sugerencias.
+    await this.destinationInput.clear();
     await this.destinationInput.fill(destination);
     // Esperar la sugerencia del destino, no elegir una sugerencia anterior.
     await this.page.getByRole('option').filter({ hasText: destination }).first().click();
