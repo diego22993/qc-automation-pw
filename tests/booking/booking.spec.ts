@@ -1,15 +1,8 @@
-import { test, expect } from '@playwright/test';
-import { BookingSearchPage } from '../../pages/booking/BookingSearchPage';
-
-test.use({
-  locale: 'en-GB', timezoneId: 'America/Argentina/Buenos_Aires',
-  actionTimeout: 15000, navigationTimeout: 30000, screenshot: 'on', trace: 'retain-on-failure',
-});
+import { test, expect } from '../../fixtures/bookingFixtures';
 
 test('Actividad 1: buscar alojamiento por destino, fechas y huespedes',
-  { tag: ['@smoke', '@booking', '@actividad1'] }, async ({ page }, testInfo) => {
+  { tag: ['@smoke', '@booking', '@actividad1'] }, async ({ page, searchPage }, testInfo) => {
     test.setTimeout(90000);
-    const searchPage = new BookingSearchPage(page);
     const destination = 'Madrid';
     const adults = 3;
     const rooms = 2;

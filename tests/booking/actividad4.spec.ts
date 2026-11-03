@@ -1,26 +1,16 @@
-import { test, expect, Page } from '@playwright/test';
-import { BookingSearchPage } from '../../pages/booking/BookingSearchPage';
-import { BookingResultsPage } from '../../pages/booking/BookingResultsPage';
-import { BookingDetailPage } from '../../pages/booking/BookingDetailPage';
-import { BookingCheckoutPage, GuestField, GuestFieldValidation } from '../../pages/booking/BookingCheckoutPage';
-
-test.use({
-  locale: 'en-GB', timezoneId: 'America/Argentina/Buenos_Aires',
-  actionTimeout: 15000, navigationTimeout: 30000, screenshot: 'on', trace: 'retain-on-failure',
-});
+import type { Page } from '@playwright/test';
+import { test, expect } from '../../fixtures/bookingFixtures';
+import type { GuestField, GuestFieldValidation } from '../../pages/booking/BookingCheckoutPage';
 
 test('Actividad 4: rechazar nombre, apellido y email vacios en checkout',
-  { tag: ['@booking', '@actividad4'] }, async ({ page, context }, testInfo) => {
+  { tag: ['@booking', '@actividad4'] }, async ({ page, context, searchPage, searchResultsPage, hotelTab, detailPage, checkoutPage }, testInfo) => {
     test.setTimeout(150000);
-    const searchPage = new BookingSearchPage(page);
-    const resultsPage = new BookingResultsPage(page);
     const today = new Date();
     const iso = (day: number) => {
       const date = new Date(today.getFullYear(), today.getMonth() + 2, day);
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     };
     let detailTab: Page;
-    let checkoutPage: BookingCheckoutPage;
     let checkoutUrl: string;
 
     await test.step('Preparar busqueda y filtros reutilizando las actividades anteriores', async () => {
@@ -39,22 +29,21 @@ test('Actividad 4: rechazar nombre, apellido y email vacios en checkout',
       }
       await expect(page).toHaveURL(/\/searchresults/);
       await expect(page.getByRole('heading', { level: 1 })).toContainText('Madrid');
-      await resultsPage.applyFreeCancellationFilter();
-      await resultsPage.applyScoreEightPlusFilter();
-      expect(await resultsPage.getResultsCount()).toBeGreaterThan(0);
+      await searchResultsPage.applyFreeCancellationFilter();
+      await searchResultsPage.applyScoreEightPlusFilter();
+      expect(await searchResultsPage.getResultsCount()).toBeGreaterThan(0);
     });
     await test.step('Abrir la ficha en otra pestana y elegir una habitacion', async () => {
-      const expectedName = await resultsPage.getFirstHotelName();
+      const expectedName = await searchResultsPage.getFirstHotelName();
       const [newTab] = await Promise.all([
-        context.waitForEvent('page', { timeout: 20000 }), resultsPage.selectFirstHotel(),
+        context.waitForEvent('page', { timeout: 20000 }), searchResultsPage.selectFirstHotel(),
       ]);
       detailTab = newTab;
+      hotelTab.bind(newTab);
       expect(await detailTab.opener()).toBe(page);
       await detailTab.waitForLoadState('domcontentloaded');
-      const detailPage = new BookingDetailPage(detailTab);
       expect(await detailPage.getHotelName()).toBe(expectedName);
       await detailPage.proceedToCheckout();
-      checkoutPage = new BookingCheckoutPage(detailTab);
       await checkoutPage.waitForGuestForm();
       checkoutUrl = detailTab.url();
       await testInfo.attach('formulario-antes-de-enviar', {

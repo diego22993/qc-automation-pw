@@ -1,13 +1,14 @@
-import { expect, Locator, Page } from '@playwright/test';
-import { BookingBasePage } from './BookingBasePage';
+import { expect, Locator } from '@playwright/test';
+import { BookingBasePage, BookingPageSource } from './BookingBasePage';
 
 export class BookingDetailPage extends BookingBasePage {
-  private readonly hotelName: Locator;
-
-  constructor(page: Page) {
-    // Esta Page corresponde a la nueva pestana, no a los resultados.
+  constructor(page: BookingPageSource) {
     super(page);
-    this.hotelName = page.locator('h1.pp-header__title');
+  }
+
+  private get hotelName(): Locator {
+    // Resolver al usarlo: la fixture se crea antes de abrir la nueva pestana.
+    return this.page.locator('h1.pp-header__title');
   }
 
   async getHotelName(): Promise<string> {

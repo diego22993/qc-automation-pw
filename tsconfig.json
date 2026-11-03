@@ -8,5 +8,5 @@
     "strict": true,
     "noEmit": true
   },
-  "include": ["tests/**/*.ts", "pages/**/*.ts", "playwright.config.ts"]
+  "include": ["tests/**/*.ts", "pages/**/*.ts", "fixtures/**/*.ts", "playwright.config.ts"]
 }

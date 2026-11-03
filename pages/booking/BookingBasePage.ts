@@ -1,10 +1,16 @@
 import { Page } from '@playwright/test';
 
-export abstract class BookingBasePage {
-  protected readonly page: Page;
+export type BookingPageSource = Page | (() => Page);
 
-  constructor(page: Page) {
-    this.page = page;
+export abstract class BookingBasePage {
+  private readonly pageSource: BookingPageSource;
+
+  constructor(page: BookingPageSource) {
+    this.pageSource = page;
+  }
+
+  protected get page(): Page {
+    return typeof this.pageSource === 'function' ? this.pageSource() : this.pageSource;
   }
 
   async navigate(url = 'https://www.booking.com/'): Promise<void> {

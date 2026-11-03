@@ -1,5 +1,5 @@
-import { expect, Locator, Page } from '@playwright/test';
-import { BookingBasePage } from './BookingBasePage';
+import { expect, Locator } from '@playwright/test';
+import { BookingBasePage, BookingPageSource } from './BookingBasePage';
 
 export type GuestField = 'firstname' | 'lastname' | 'email';
 
@@ -15,17 +15,20 @@ export interface GuestFieldValidation {
 }
 
 export class BookingCheckoutPage extends BookingBasePage {
-  private readonly fields: Record<GuestField, Locator>;
-  private readonly continueButton: Locator;
-
-  constructor(page: Page) {
+  constructor(page: BookingPageSource) {
     super(page);
-    this.fields = {
-      firstname: page.locator('#bookForm input[name="firstname"]:not([type="hidden"])'),
-      lastname: page.locator('#bookForm input[name="lastname"]:not([type="hidden"])'),
-      email: page.locator('#bookForm input[name="email"]:not([type="hidden"])'),
+  }
+
+  private get fields(): Record<GuestField, Locator> {
+    return {
+      firstname: this.page.locator('#bookForm input[name="firstname"]:not([type="hidden"])'),
+      lastname: this.page.locator('#bookForm input[name="lastname"]:not([type="hidden"])'),
+      email: this.page.locator('#bookForm input[name="email"]:not([type="hidden"])'),
     };
-    this.continueButton = page.locator('#bookForm').getByRole('button', { name: /^Next:\s*Final details/i });
+  }
+
+  private get continueButton(): Locator {
+    return this.page.locator('#bookForm').getByRole('button', { name: /^Next:\s*Final details/i });
   }
 
   async waitForGuestForm(): Promise<void> {
