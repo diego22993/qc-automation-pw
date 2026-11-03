@@ -40,6 +40,16 @@ export class BookingResultsPage extends BookingBasePage {
     return await this.freeCancellation.isChecked() && await this.scoreEightPlus.isChecked();
   }
 
+  async getFirstHotelName(): Promise<string> {
+    const title = this.propertyCards.first().getByTestId('title');
+    await expect(title).toBeVisible();
+    return (await title.innerText()).trim();
+  }
+
+  async selectFirstHotel(): Promise<void> {
+    await this.propertyCards.first().getByTestId('title-link').click();
+  }
+
   private async applyFilter(checkbox: Locator, filter: string): Promise<void> {
     await expect(checkbox).toBeVisible({ timeout: 15000 });
     if (await checkbox.isChecked()) return;
@@ -52,7 +62,15 @@ export class BookingResultsPage extends BookingBasePage {
         const data = decodeURIComponent(request.url() + (request.postData() ?? ''));
         return response.ok() && /searchresults|graphql/.test(request.url()) && data.includes(filter);
       }, { timeout: 20000 }),
-      checkbox.check(),
+      expect(async () => {
+        // El HTML inicial puede aceptar el clic antes de hidratarse y perderlo.
+        // check() es idempotente; reintentamos hasta que la URL refleje el filtro.
+        await checkbox.check();
+        await expect(this.page).toHaveURL(
+          url => (url.searchParams.get('nflt') ?? '').split(';').includes(filter),
+          { timeout: 2000 },
+        );
+      }).toPass({ timeout: 20000 }),
     ]);
     await response.finished();
     await expect(checkbox).toBeChecked();

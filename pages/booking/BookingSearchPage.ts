@@ -31,8 +31,9 @@ export class BookingSearchPage extends BookingBasePage {
       if (await this.occupancyButton.getAttribute('aria-expanded') !== 'true') {
         await this.occupancyButton.click();
       }
-      await expect(this.doneButton).toBeVisible({ timeout: 1500 });
-    }).toPass({ timeout: 15000 });
+      // El cierre del modal tambien consume el tiempo de esta asercion.
+      await expect(this.doneButton).toBeVisible({ timeout: 10000 });
+    }).toPass({ timeout: 30000 });
     await this.setCounter('Adults', adults);
     await this.setCounter('Children', 0);
     await this.setCounter('Rooms', rooms);
