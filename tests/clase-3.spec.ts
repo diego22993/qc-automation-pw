@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 
-test.describe("LOGIN.HTML - Nivel Principiante", { tag: ["@login"] },() => {
+test.describe("LOGIN.HTML - Nivel Basico", { tag: ["@login","@basico"] },() => {
   test.beforeEach(async ({ page }) => {
     await page.goto("https://www.saucedemo.com/");
     await expect(page).toHaveURL("https://www.saucedemo.com/");
@@ -41,7 +41,7 @@ test.describe("LOGIN.HTML - Nivel Principiante", { tag: ["@login"] },() => {
   });
 });
 
-test.describe("INVENTARIO.HTML - Nivel Básico", {tag: ["@Inventario"]}, () =>{
+test.describe("INVENTARIO.HTML - Nivel Básico", {tag: ["@Inventario", "@basico"]}, () =>{
 
   test.beforeEach(async ({ page }) => {
     await page.goto("https://www.saucedemo.com/");
@@ -92,7 +92,7 @@ test.describe("INVENTARIO.HTML - Nivel Básico", {tag: ["@Inventario"]}, () =>{
   
 });
 
-test.describe("CART.HTML - Nivel Básico", { tag: ["@cart"] },() => {
+test.describe("CART.HTML - Nivel Básico", { tag: ["@cart", "@basico"] },() => {
   test.beforeEach(async ({ page }) => {
     await page.goto("https://www.saucedemo.com/");
     await expect(page).toHaveURL("https://www.saucedemo.com/");
@@ -119,7 +119,7 @@ test.describe("CART.HTML - Nivel Básico", { tag: ["@cart"] },() => {
   });
 
 });
-test.describe("CHECKOUT-STEP-ONE.HTML - Nivel Básico", { tag: ["@cart"] },() => {
+test.describe("CHECKOUT-STEP-ONE.HTML - Nivel Básico", { tag: ["@cart","@basico"] },() => {
   test.beforeEach(async ({ page }) => {
     await page.goto("https://www.saucedemo.com/");
     await expect(page).toHaveURL("https://www.saucedemo.com/");
@@ -161,7 +161,7 @@ test.describe("CHECKOUT-STEP-ONE.HTML - Nivel Básico", { tag: ["@cart"] },() =>
 
 test.describe(
   "CHECKOUT - Nivel Básico",
-  { tag: ["@checkout"] },
+  { tag: ["@checkout","@basico" ] },
   () => {
     test.beforeEach(async ({ page }) => {
       await page.goto("https://www.saucedemo.com/");
