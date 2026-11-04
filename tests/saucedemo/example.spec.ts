@@ -120,7 +120,7 @@ test.describe('SauceDemo - Flujo Monolítico E2E de Compra de Principio a Fin si
     
   })
 
-  test.only('ir a booking', async ({page})=>{
+  test('ir a booking', async ({page})=>{
     await page.goto('https://www.booking.com/');
   });
 });
