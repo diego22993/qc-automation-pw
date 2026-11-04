@@ -1,0 +1,3 @@
+username,password,expectedOutcome
+standard_user,secret_sauce,success
+locked_out_user,secret_sauce,locked_out
