@@ -10,7 +10,6 @@ export class BookingSearchPage extends BookingBasePage {
   constructor(page: Page) {
     super(page);
     this.destinationInput = page.locator('input[name="ss"]');
-    // Usamos el rol accesible y nombre exacto, o un contenedor padre para evitar ambigüedades
     this.searchButton = page.getByRole('button', { name: 'Search', exact: true });
     this.datePickerOpenBtn = page.locator('[data-testid="date-display-field-start"]');
     this.guestsOccupancyBtn = page.locator('[data-testid="occupancy-config"]');
@@ -39,10 +38,8 @@ export class BookingSearchPage extends BookingBasePage {
     await this.selectDate(checkInDate);
     await this.selectDate(checkOutDate);
 
-    // Forzar el clic para evitar intercepciones de capas de UI o modales flotantes
-await this.searchButton.click({ force: true });
-
-    await this.clickElement(this.searchButton);
+    // Hacer clic en buscar de forma forzada para evitar capas flotantes
+    await this.searchButton.click({ force: true });
   }
 
   private async selectDate(dateIso: string) {
