@@ -2,17 +2,11 @@ import { expect } from "@playwright/test";
 import { BookingBasePage } from "./BookingBasePage";
 
 export class BookingCheckoutPage extends BookingBasePage {
-  readonly firstNameInput = this.page.locator(
-    'input[name="firstname"]',
-  );
+  readonly firstNameInput = this.page.locator('input[name="firstname"]');
 
-  readonly lastNameInput = this.page.locator(
-    'input[name="lastname"]',
-  );
+  readonly lastNameInput = this.page.locator('input[name="lastname"]');
 
-  readonly emailInput = this.page.locator(
-    'input[name="email"]',
-  );
+  readonly emailInput = this.page.locator('input[name="email"]');
 
   readonly submitBtn = this.page.getByRole("button", {
     name: /siguiente|continuar|next/i,

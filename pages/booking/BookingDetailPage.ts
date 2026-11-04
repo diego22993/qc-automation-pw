@@ -14,9 +14,7 @@ export class BookingDetailPage extends BookingBasePage {
   }
 
   async reserveRoom(): Promise<void> {
-    const roomSelector = this.page
-      .locator('select[name^="nr_rooms"]')
-      .first();
+    const roomSelector = this.page.locator('select[name^="nr_rooms"]').first();
 
     await expect(roomSelector).toBeVisible();
 
@@ -44,9 +42,7 @@ export class BookingDetailPage extends BookingBasePage {
     await expect(reserveButton).toBeVisible();
     await reserveButton.click();
 
-    const firstNameInput = this.page.locator(
-      'input[name="firstname"]',
-    );
+    const firstNameInput = this.page.locator('input[name="firstname"]');
 
     await expect(firstNameInput).toBeVisible();
   }

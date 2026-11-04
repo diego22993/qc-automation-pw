@@ -1,8 +1,4 @@
-import {
-  expect,
-  type Locator,
-  type Page,
-} from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { BookingBasePage } from "./BookingBasePage";
 
 export class BookingFlightsPage extends BookingBasePage {
@@ -14,9 +10,7 @@ export class BookingFlightsPage extends BookingBasePage {
   constructor(page: Page) {
     super(page);
 
-    this.languageButton = page.getByTestId(
-      "header-language-picker-trigger",
-    );
+    this.languageButton = page.getByTestId("header-language-picker-trigger");
 
     this.cheapestSortButton = page.getByRole("button", {
       name: /más barato|menor precio|cheapest|lowest price/i,
@@ -33,16 +27,12 @@ export class BookingFlightsPage extends BookingBasePage {
   async selectSpanishArgentina(): Promise<void> {
     await this.languageButton.click();
 
-    const spanishArgentinaOption = this.page.getByText(
-      "Español (Argentina)",
-      { exact: true },
-    );
+    const spanishArgentinaOption = this.page.getByText("Español (Argentina)", {
+      exact: true,
+    });
 
     await spanishArgentinaOption.click();
-    await expect(this.page.locator("html")).toHaveAttribute(
-      "lang",
-      /^es/i,
-    );
+    await expect(this.page.locator("html")).toHaveAttribute("lang", /^es/i);
   }
 
   async searchRoundTrip(
@@ -98,9 +88,7 @@ export class BookingFlightsPage extends BookingBasePage {
   }
 
   private async selectDate(dateIso: string): Promise<void> {
-    const dateCell = this.page.locator(
-      `[data-date="${dateIso}"]:visible`,
-    );
+    const dateCell = this.page.locator(`[data-date="${dateIso}"]:visible`);
 
     await expect(dateCell).toBeVisible();
     await dateCell.click();

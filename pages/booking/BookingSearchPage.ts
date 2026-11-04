@@ -1,8 +1,4 @@
-import {
-  expect,
-  type Locator,
-  type Page,
-} from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { BookingBasePage } from "./BookingBasePage";
 
 export class BookingSearchPage extends BookingBasePage {
@@ -19,9 +15,7 @@ export class BookingSearchPage extends BookingBasePage {
     this.searchButton = page.getByRole("button", {
       name: /^(Buscar|Search)$/i,
     });
-    this.datePickerOpenButton = page.getByTestId(
-      "searchbox-dates-container",
-    );
+    this.datePickerOpenButton = page.getByTestId("searchbox-dates-container");
   }
 
   async goto(): Promise<void> {
@@ -72,10 +66,17 @@ export class BookingSearchPage extends BookingBasePage {
       await resultsLink.click();
     }
 
-    await expect(this.page).toHaveURL(/\/searchresults/);
-    await expect(
-      this.page.getByTestId("property-card").first(),
-    ).toBeVisible();
+    await expect(this.page).toHaveURL(/\/(city|searchresults)/);
+
+    if (this.page.url().includes("/city/")) {
+      await expect(
+        this.page.getByRole("heading", {
+          name: new RegExp(`${destination}:.*hoteles`, "i"),
+        }),
+      ).toBeVisible();
+    } else {
+      await expect(this.page.getByTestId("property-card").first()).toBeVisible();
+    }
   }
 
   private async selectDate(dateIso: string): Promise<void> {
@@ -83,13 +84,13 @@ export class BookingSearchPage extends BookingBasePage {
       .locator(`[data-date="${dateIso}"]:visible`)
       .first();
 
-    const firstVisibleDate = this.page
-      .locator("[data-date]:visible")
-      .first();
+    const firstVisibleDate = this.page.locator("[data-date]:visible").first();
 
-    const nextMonthButton = this.page.getByRole("button", {
-      name: /mes siguiente|next month/i,
-    }).first();
+    const nextMonthButton = this.page
+      .getByRole("button", {
+        name: /mes siguiente|next month/i,
+      })
+      .first();
 
     await expect(firstVisibleDate).toBeVisible();
 
@@ -101,8 +102,7 @@ export class BookingSearchPage extends BookingBasePage {
 
       if (month === 17) break;
 
-      const previousDate =
-        await firstVisibleDate.getAttribute("data-date");
+      const previousDate = await firstVisibleDate.getAttribute("data-date");
 
       await expect(nextMonthButton).toBeVisible();
       await nextMonthButton.click();
@@ -139,9 +139,7 @@ export class BookingSearchPage extends BookingBasePage {
       if (currentAdults === adults) break;
 
       const button =
-        currentAdults < adults
-          ? increaseAdultsButton
-          : decreaseAdultsButton;
+        currentAdults < adults ? increaseAdultsButton : decreaseAdultsButton;
 
       await expect(button).toBeVisible();
       await button.click();

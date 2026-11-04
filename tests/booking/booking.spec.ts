@@ -16,7 +16,7 @@ const FECHA_IDA_VUELO = "2026-11-10";
 const FECHA_REGRESO_VUELO = "2026-11-26";
 
 test.describe("Actividades de Booking sin custom fixtures", () => {
-  test.setTimeout(120_000);
+  //test.setTimeout(120_000);
 
   test(
     "Actividad 1: buscar alojamiento con fechas fijas",
@@ -30,19 +30,30 @@ test.describe("Actividades de Booking sin custom fixtures", () => {
         FECHA_SALIDA,
       );
 
-      await expect(page).toHaveURL(/\/searchresults/);
+      await expect(page).toHaveURL(/\/(city|searchresults)/);
       await expect(
-        page.getByRole("heading", {
-          name: new RegExp(DESTINO_ALOJAMIENTO, "i"),
-        }).first(),
+        page
+          .getByRole("heading", {
+            name: new RegExp(DESTINO_ALOJAMIENTO, "i"),
+          })
+          .first(),
       ).toBeVisible();
 
-      await expect(page).toHaveURL(
-        (url) =>
-          url.searchParams.get("checkin") === FECHA_INGRESO &&
-          url.searchParams.get("checkout") === FECHA_SALIDA &&
-          url.searchParams.get("group_adults") === "2",
-      );
+      if (page.url().includes("/searchresults")) {
+        await expect(page).toHaveURL(
+          (url) =>
+            url.searchParams.get("checkin") === FECHA_INGRESO &&
+            url.searchParams.get("checkout") === FECHA_SALIDA &&
+            url.searchParams.get("group_adults") === "2",
+        );
+      } else {
+        await expect(page.getByTestId("searchbox-dates-container")).toContainText(
+          /10 nov.*15 nov/i,
+        );
+        await expect(page.getByTestId("occupancy-config")).toContainText(
+          /2 adultos/i,
+        );
+      }
     },
   );
 
@@ -68,8 +79,7 @@ test.describe("Actividades de Booking sin custom fixtures", () => {
       await expect(page).toHaveURL((url) => {
         const filters = (url.searchParams.get("nflt") ?? "").split(";");
 
-        return filters.includes("fc=2") &&
-          filters.includes("review_score=80");
+        return filters.includes("fc=2") && filters.includes("review_score=80");
       });
     },
   );

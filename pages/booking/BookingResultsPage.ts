@@ -14,17 +14,11 @@ export class BookingResultsPage extends BookingBasePage {
   private readonly propertyCards = this.page.getByTestId("property-card");
 
   async applyFreeCancellationFilter(): Promise<void> {
-    await this.applyFilter(
-      /cancelación gratuita|free cancellation/i,
-      "fc=2",
-    );
+    await this.applyFilter(/cancelación gratuita|free cancellation/i, "fc=2");
   }
 
   async applyRatingFilter(): Promise<void> {
-    await this.applyFilter(
-      /8\+|8\.0|muy bien|very good/i,
-      "review_score=80",
-    );
+    await this.applyFilter(/8\+|8\.0|muy bien|very good/i, "review_score=80");
   }
 
   async getResultsCount(): Promise<number> {
@@ -33,9 +27,7 @@ export class BookingResultsPage extends BookingBasePage {
   }
 
   async sortByLowestPrice(): Promise<void> {
-    const sortButton = this.page.getByTestId(
-      "sorters-dropdown-trigger",
-    );
+    const sortButton = this.page.getByTestId("sorters-dropdown-trigger");
 
     await expect(sortButton).toBeVisible();
     await sortButton.click();

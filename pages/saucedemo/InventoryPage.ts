@@ -10,13 +10,13 @@ export class InventoryPage {
   constructor(page: Page) {
     this.page = page;
     this.inventoryItems = page.locator(".inventory_item");
-    this.cartLink = page.getByTestId("shopping-cart-link");
-    this.cartBadge = page.getByTestId("shopping-cart-badge");
+    this.cartLink = page.locator('[data-test="shopping-cart-link"]');
+    this.cartBadge = page.locator('[data-test="shopping-cart-badge"]');
   }
 
   async expectLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/inventory\.html/);
-    await expect(this.page.getByTestId("title")).toHaveText("Products");
+    await expect(this.page.locator('[data-test="title"]')).toHaveText("Products");
     await expect(this.inventoryItems.first()).toBeVisible();
   }
 
