@@ -20,8 +20,20 @@ export class CheckoutOverviewPage {
     await expect(this.cartItems.filter({ hasText: productName })).toBeVisible();
   }
 
+  async expectSubtotalPrefix(prefix: string): Promise<void> {
+    await expect(this.page.locator(".summary_subtotal_label")).toContainText(prefix);
+  }
+
+  async expectTaxVisible(): Promise<void> {
+    await expect(this.page.locator(".summary_tax_label")).toBeVisible();
+  }
+
+  async expectTotalVisible(): Promise<void> {
+    await expect(this.page.locator(".summary_total_label")).toBeVisible();
+  }
+
   async finish(): Promise<void> {
-    await this.page.locator('[data-test="finish"]').click();
+    await this.page.getByRole("button", { name: "Finish" }).click();
     await expect(this.page).toHaveURL(/checkout-complete\.html/);
   }
 }
