@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-/*
+
 test.describe('LOGIN.HTML - Nivel Basico', {tag: ["@login", "@basico"]}, () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('https://www.saucedemo.com/');
@@ -158,36 +158,71 @@ test.describe('CHECKOUT-STEP-TWO.HTML - Nivel Basico', {tag: ["@checkout-step-tw
     });
 
 });
-*/
+
+
 
 test.describe('LOGIN E INVENTARIO - Nivel Intermedio', {tag: ["@login", "@inventario", "@intermedio"]}, () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('https://www.saucedemo.com/');
+        await page.locator('[data-test="username"]').fill('standard_user');
+        await page.locator('[data-test="password"]').fill('secret_sauce');
     });
     
     test('Ejercicio 21' , async ({ page }) => {
+        await page.locator('[data-test="login-button"]');
+        await expect(page.locator('[data-test="login-button"]')).toBeVisible();
+        await page.locator('[data-test="login-button"]').click();
     });
 
     test('Ejercicio 22', async ({ page }) => {
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+        await page.getByRole('combobox').selectOption('lohi');
     });
 
     test('Ejercicio 23', async ({ page }) => {
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+        await page.getByRole('combobox').selectOption('za');
     });
 
     test('Ejercicio 24', async ({ page }) => {
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+        await expect(page.locator('.inventory_item').filter({ hasText: 'Sauce Labs Onesie' })).toBeVisible();
     });
 
     test('Ejercicio 25', async ({ page }) => {
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+        await page.locator('.inventory_item')
+        .filter({ hasText: 'Sauce Labs Bike Light' })
+        .getByRole('button', { name: 'Add to cart' })
+        .click();
     });
 
     test('Ejercicio 26', async ({ page }) => {
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+        await page.locator('#inventory_container')
+        .locator('.inventory_item_price');
+        await expect(page.locator('#inventory_container').locator('.inventory_item_price')).toHaveCount(6);
+
     });
 
     test('Ejercicio 27', async ({ page }) => {
+        await page.locator('[data-test="login-button"]').click();
+        await expect(page).toHaveURL(/.*inventory.html/);
+        await expect(page.locator('.inventory_item').filter({ hasText: 'Sauce Labs Fleece Jacket' })
+        .locator('.inventory_item_price').filter({ hasText: '$49.99' })).toBeVisible();
+
     });
 
 });
-/* 
+
+
+
+
 test.describe('CARRITO Y NAVEGACION - Nivel Intermedio', {tag: ["@cart", "@navigation", "@intermedio"]}, () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('https://www.saucedemo.com/');
@@ -197,20 +232,26 @@ test.describe('CARRITO Y NAVEGACION - Nivel Intermedio', {tag: ["@cart", "@navig
     });
     
     test('Ejercicio 28', async ({ page }) => {
+        await page.locator('button').filter({ hasText: 'Add to cart' }).nth(0).click();
+        await page.locator('button').filter({ hasText: 'Add to cart' }).nth(1).click();
+        await expect(page.locator('.shopping_cart_badge')).toHaveText('2');
     });
 
     test('Ejercicio 29', async ({ page }) => {
+
     });
 
     test('Ejercicio 30', async ({ page }) => {
+
     });
 
     test('Ejercicio 31', async ({ page }) => {
+
     });
 
 });
 
-
+/* 
 test.describe('FORMULARIO CHECKOUT-STEP-ONE - Nivel Intermedio', {tag: ["@checkout-step-one", "@intermedio"]}, () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('https://www.saucedemo.com/');
