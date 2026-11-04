@@ -10,9 +10,11 @@ export class BookingBasePage {
   /**
    * Navega a la URL base configurada en playwright.config.ts
    */
-  async navigate() {
-    await this.page.goto('/');
-  }
+  // pages/booking/BookingBasePage.ts
+// pages/booking/BookingBasePage.ts
+async navigate() {
+  await this.page.goto('/', { waitUntil: 'domcontentloaded' });
+}
 
   /**
    * Espera a que un elemento esté visible y realiza un clic

@@ -6,12 +6,18 @@ export class BookingCheckoutPage extends BookingBasePage {
 
   constructor(page: Page) {
     super(page);
-    // Ubica el botón principal de envío en el flujo de reserva
-    this.submitButton = page.locator('button[type="submit"]').first();
+    // Selectores ampliados para cubrir diferentes idiomas y tipos de botones en el checkout
+    this.submitButton = page.locator(
+      'button[type="submit"], button:has-text("Final"), button:has-text("Next"), button:has-text("Siguiente"), button:has-text("Book"), button:has-text("Reservar")'
+    ).first();
   }
 
   async validateRequiredFields() {
-    // Valida que el botón de confirmación o envío sea visible e interactivo en la pantalla
+    await this.submitButton.waitFor({ state: 'visible', timeout: 15000 });
     await expect(this.submitButton).toBeVisible();
+  }
+
+  async submitCheckoutForm() {
+    await this.submitButton.click();
   }
 }

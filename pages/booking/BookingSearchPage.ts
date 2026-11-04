@@ -7,15 +7,17 @@ export class BookingSearchPage extends BookingBasePage {
 
   constructor(page: Page) {
     super(page);
-    // Selectores para la caja de búsqueda principal de la home
     this.destinationInput = page.locator('input[name="ss"], input[id="searchbox-horizontal-destination-input"]');
     this.searchButton = page.locator('button[type="submit"]');
   }
 
   async searchDestination(destination: string) {
     await this.typeText(this.destinationInput, destination);
-    // Breve pausa táctica opcional para asegurar que se despliegue el dropdown de autocompletado si aplica
-    await this.page.waitForTimeout(500); 
+    
+    // Forzamos el cierre del calendario presionando Escape y haciendo clic fuera
+    await this.page.keyboard.press('Escape');
+    await this.page.locator('body').click({ position: { x: 10, y: 10 } }).catch(() => {});
+    
     await this.clickElement(this.searchButton);
   }
 }
