@@ -1,22 +1,25 @@
-import { test, expect } from "@playwright/test";
-import { BookingSearchPage } from "../../pages/booking/BookingSearchPage";
-import { BookingDetailPage } from "../../pages/booking/BookingDetailPage";
+import { test, expect } from '@playwright/test';
+import { BookingSearchPage } from '../../pages/booking/BookingSearchPage';
+import { BookingResultsPage } from '../../pages/booking/BookingResultsPage';
 
-test("Actividad 3: Capturar nueva pestaña al seleccionar alojamiento", async ({ page, context }) => {
+test('Actividad 3: Capturar nueva pestaña al seleccionar alojamiento', async ({ page, context }) => {
   const searchPage = new BookingSearchPage(page);
+  const resultsPage = new BookingResultsPage(page);
 
-  await searchPage.goto();
-  await searchPage.searchDestination("Madrid", "2026-11-10", "2026-11-15");
+  await searchPage.navigate();
+  await searchPage.searchDestination('Madrid');
 
-  const firstHotelLink = page.locator('[data-testid="title-link"]').first();
+  await resultsPage.validateResultsAreDisplayed();
 
+  const firstHotelLink = resultsPage.propertyCard.locator('[data-testid="title-link"]').first();
+  await firstHotelLink.waitFor({ state: 'visible' });
+
+  // Manejo de la nueva pestaña asegurando el click con { force: true } para evitar overlays
   const [newPage] = await Promise.all([
     context.waitForEvent('page'),
-    firstHotelLink.click(),
+    firstHotelLink.click({ force: true }),
   ]);
 
   await newPage.waitForLoadState();
-  const detailPage = new BookingDetailPage(newPage);
-  
-  await expect(newPage).toHaveURL(/.*hotel/);
+  expect(newPage.url()).toContain('hotel');
 });

@@ -2,28 +2,27 @@ import { Page, Locator } from '@playwright/test';
 import { BookingBasePage } from './BookingBasePage';
 
 export class BookingResultsPage extends BookingBasePage {
-  private freeCancellationFilter: Locator;
-  private reviewScoreFilter: Locator;
-  private propertyCard: Locator;
+  readonly freeCancellationFilter: Locator;
+  readonly reviewScoreFilter: Locator;
+  readonly propertyCard: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.freeCancellationFilter = page.locator('input[name="fc=1"], text="Free cancellation"').first();
-    this.reviewScoreFilter = page.locator('text="Very Good: 8+"').first();
+    // Selectores limpios y robustos basados en expresiones regulares de texto visible
+    this.freeCancellationFilter = page.locator('text=/Cancelación gratuita|Free cancellation/i');
+    this.reviewScoreFilter = page.locator('text=/Very Good|Muy bueno/i').first();
     this.propertyCard = page.locator('[data-testid="property-card"]');
   }
 
   async applyFreeCancellationFilter() {
-    await this.clickElement(this.freeCancellationFilter);
-    await this.page.waitForLoadState('networkidle');
+    await this.clickElement(this.freeCancellationFilter.first());
   }
 
   async applyReviewScoreFilter() {
     await this.clickElement(this.reviewScoreFilter);
-    await this.page.waitForLoadState('networkidle');
   }
 
-  async getResultsCount(): Promise<number> {
-    return await this.propertyCard.count();
+  async validateResultsAreDisplayed() {
+    await this.propertyCard.first().waitFor({ state: 'visible' });
   }
 }

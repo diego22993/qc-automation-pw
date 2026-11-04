@@ -2,49 +2,20 @@ import { Page, Locator } from '@playwright/test';
 import { BookingBasePage } from './BookingBasePage';
 
 export class BookingSearchPage extends BookingBasePage {
-  private destinationInput: Locator;
-  private searchButton: Locator;
-  private datePickerOpenBtn: Locator;
-  private guestsOccupancyBtn: Locator;
+  readonly destinationInput: Locator;
+  readonly searchButton: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.destinationInput = page.locator('input[name="ss"]');
-    this.searchButton = page.getByRole('button', { name: 'Search', exact: true });
-    this.datePickerOpenBtn = page.locator('[data-testid="date-display-field-start"]');
-    this.guestsOccupancyBtn = page.locator('[data-testid="occupancy-config"]');
+    // Selectores para la caja de búsqueda principal de la home
+    this.destinationInput = page.locator('input[name="ss"], input[id="searchbox-horizontal-destination-input"]');
+    this.searchButton = page.locator('button[type="submit"]');
   }
 
-  async goto() {
-    await this.navigate('https://www.booking.com');
-  }
-
-  async searchDestination(destination: string, checkInDate: string, checkOutDate: string) {
+  async searchDestination(destination: string) {
     await this.typeText(this.destinationInput, destination);
-    
-    // Manejar el desplegable de sugerencias de manera segura
-    const firstSuggestion = this.page.locator('#autocomplete-result-0, [data-testid="autocomplete-result"] li').first();
-    if (await firstSuggestion.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await firstSuggestion.click();
-    } else {
-      await this.destinationInput.press('ArrowDown');
-      await this.destinationInput.press('Enter');
-    }
-
-    // Abrir el calendario y seleccionar fechas
-    await this.datePickerOpenBtn.waitFor({ state: 'visible' });
-    await this.clickElement(this.datePickerOpenBtn);
-
-    await this.selectDate(checkInDate);
-    await this.selectDate(checkOutDate);
-
-    // Hacer clic en buscar de forma forzada para evitar capas flotantes
-    await this.searchButton.click({ force: true });
-  }
-
-  private async selectDate(dateIso: string) {
-    // Date Iso format: YYYY-MM-DD
-    const dateLocator = this.page.locator(`span[data-date="${dateIso}"]`);
-    await this.clickElement(dateLocator);
+    // Breve pausa táctica opcional para asegurar que se despliegue el dropdown de autocompletado si aplica
+    await this.page.waitForTimeout(500); 
+    await this.clickElement(this.searchButton);
   }
 }

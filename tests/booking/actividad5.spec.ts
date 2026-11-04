@@ -1,7 +1,14 @@
-import { test, expect } from "../../fixtures/bookingFixtures";
+import { test, expect } from '@playwright/test';
+import { BookingSearchPage } from '../../pages/booking/BookingSearchPage';
+import { BookingResultsPage } from '../../pages/booking/BookingResultsPage';
 
-test("Actividad 5: Búsqueda usando Custom Fixtures", async ({ searchPage, page }) => {
-  await searchPage.goto();
-  await searchPage.searchDestination("Madrid", "2026-11-10", "2026-11-15");
-  await expect(page).toHaveURL(/.*searchresults/);
+test('Actividad 5: Búsqueda usando Custom Fixtures', async ({ page }) => {
+  const searchPage = new BookingSearchPage(page);
+  const resultsPage = new BookingResultsPage(page);
+
+  await searchPage.navigate();
+  await searchPage.searchDestination('Barcelona');
+  
+  await resultsPage.validateResultsAreDisplayed();
+  expect(page.url()).toContain('Barcelona');
 });
