@@ -1,39 +1,16 @@
+import { test, expect } from "@playwright/test";
+import { BookingSearchPage } from '../../../page/BookingSearchPgage';
 
-import { Page, Locator } from '@playwright/test';
-import { BookingBasePage } from '../../../page/BookingBasePage';
+test(
+  "Actividad 1: Búsqueda dinámica con manejo de modales en Booking",
+  { tag: ["@smoke", "@booking"] },
+  async ({ page }) => {
+    const searchPage = new BookingSearchPage(page);
 
-export class BookingSearchPage extends BookingBasePage {
-  private destinationInput: Locator;
-  private searchButton: Locator;
-  private datePickerOpenBtn: Locator;
-  private guestsOccupancyBtn: Locator;
+    await searchPage.goto();
+    await searchPage.searchDestination("Madrid", "2026-11-10", "2026-11-15");
 
-  constructor(page: Page) {
-    super(page);
-    this.destinationInput = page.locator('input[name="ss"]');
-    this.searchButton = page.locator('button[type="submit"]');
-    this.datePickerOpenBtn = page.locator('[data-testid="date-display-field-start"]');
-    this.guestsOccupancyBtn = page.locator('[data-testid="occupancy-config"]');
-  }
-
-  async goto() {
-    await this.navigate('https://www.booking.com');
-  }
-
-  async searchDestination(destination: string, checkInDate: string, checkOutDate: string) {
-    await this.typeText(this.destinationInput, destination);
-    
-    // Abrir y seleccionar fechas en el calendario
-    await this.clickElement(this.datePickerOpenBtn);
-    await this.selectDate(checkInDate);
-    await this.selectDate(checkOutDate);
-
-    await this.clickElement(this.searchButton);
-  }
-
-  private async selectDate(dateIso: string) {
-    // Date Iso format: YYYY-MM-DD
-    const dateLocator = this.page.locator(`span[data-date="${dateIso}"]`);
-    await this.clickElement(dateLocator);
-  }
-}
+    await expect(page).toHaveURL(/.*searchresults/);
+    await expect(page.locator("h1")).toContainText(/Madrid/i);
+  },
+);
