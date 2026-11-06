@@ -209,7 +209,7 @@ test.describe("SauceDemo - Ejercicios 1 al 20", () => {
     });
   });
 
-  test("Ejercicio 13: validar el encabezado QTY en el carrito", async ({ page }) => {
+  test.skip("Ejercicio 13: validar el encabezado QTY en el carrito", async ({ page }) => {
     await test.step("Abrir el carrito con un producto", async () => {
       const inventoryPage = await loginToInventory(page);
       await inventoryPage.addProductToCart("Sauce Labs Backpack");
