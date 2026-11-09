@@ -22,8 +22,8 @@ flowchart TB
         e10["Ejercicio 10<br/>first() en Add to cart<br/>Badge del carrito = 1"]
         e11["Ejercicio 11<br/>last() en Add to cart<br/>Badge del carrito = 1"]
         e12["Ejercicio 12<br/>nth(1) en imagen del producto<br/>Detalle de Bike Light"]
-        e22["Ejercicio 22<br/>Orden Price low to high<br/>Valor del combobox = lohi"]
-        e23["Ejercicio 23<br/>Orden Name Z to A<br/>Valor del combobox = za"]
+        e22["Ejercicio 22<br/>Price low to high: seleccionar lohi<br/>Validar combobox y orden visible de todos los precios"]
+        e23["Ejercicio 23<br/>Name Z to A: seleccionar za<br/>Validar combobox y orden visible de todos los nombres"]
         e24["Ejercicio 24<br/>Filtrar tarjeta Sauce Labs Onesie<br/>Una tarjeta coincidente"]
         e25["Ejercicio 25<br/>Agregar Bike Light<br/>Badge del carrito = 1"]
         e26["Ejercicio 26<br/>Encadenar desde inventory_container<br/>Seis precios de producto"]
@@ -58,7 +58,7 @@ flowchart TB
 
     subgraph outputs["Flujo E2E y artefactos"]
         flowGroup["Checkout completo y generacion de PDF"]
-        pdfTest["Test completar checkout y generar PDF<br/>Login, producto, carrito, datos y Finish<br/>Descarga .pdf y valida que no falle"]
+        pdfTest["E2E: completar checkout y generar PDF de pedido<br/>Login, agregar producto, carrito y datos del comprador<br/>Finish, confirmar pedido y pulsar Generate PDF order<br/>Descargar archivo .pdf y validar nombre, descarga y firma %PDF-"]
     end
 
     suite --> loginGroup
