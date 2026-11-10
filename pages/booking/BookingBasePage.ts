@@ -7,43 +7,31 @@ export abstract class BookingBasePage {
     this.page = page;
   }
 
-  async navigate(path: string = '/') {
-    await test.step(`Navegar a la Pagina ${path}`, async () => { // Agregar una descripción para el reporte de Playwright
-    await this.page.goto(path, { waitUntil: 'domcontentloaded' }); }); // Navegar a la URL especificada y esperar a que el DOM esté completamente cargado
-    await this.dismissModalsIfPresent(); // Despues de navegar, intentar cerrar cualquier modal o banner que pueda aparecer
-  }
-
   async dismissModalsIfPresent() {
-    // Manejo de banners de Cookies o Popups emergentes comunes en Booking
-    await test.step('Cerrar modales si están presentes', async () => { // Agregar una descripción para el reporte de Playwright
-    const cookieAcceptBtn = this.page.locator('#onetrust-accept-btn-handler');
-    const closeSignInModalBtn = this.page.locator('button[aria-label="Dismiss sign-in info."]');
+    // Selector más genérico para el botón "X" de cerrar el popup de inicio de sesión de Booking
+    const closeSignInModalBtn = this.page.locator('button[aria-label="Dismiss sign-in info."], button[aria-label="Cerrar el cuadro de diálogo de inicio de sesión"]');
     
-
     try {
-      if (await cookieAcceptBtn.isVisible({ timeout: 3000 })) {
-        await cookieAcceptBtn.click();
-      }
-      if (await closeSignInModalBtn.isVisible({ timeout: 3000 })) {
+      // Esperamos un momento breve por si el popup tarda un segundo en aparecer
+      await this.page.waitForTimeout(1500);
+      
+      if (await closeSignInModalBtn.isVisible()) {
         await closeSignInModalBtn.click();
+        // Le damos tiempo a que la animación de cierre termine
+        await this.page.waitForTimeout(1000);
       }
     } catch (error) {
-      // Si no aparecen los modales, continúa la ejecución normalmente
-    } 
-      });
+      // Si falla o no aparece, ignoramos el error para que el test siga
+    }
   }
 
   async clickElement(locator: Locator) {
-    await test.step('Hacer clic en el elemento', async () => { // Agregar una descripción para el reporte de Playwright
     await locator.waitFor({ state: 'visible' });
     await locator.click();
-    });
   }
 
   async typeText(locator: Locator, text: string) {
-    await test.step('Escribir texto en el elemento', async () => { // Agregar una descripción para el reporte de Playwright
-      await locator.waitFor({ state: 'visible' });
-      await locator.fill(text);
-    });
+    await locator.waitFor({ state: 'visible' });
+    await locator.fill(text);
   }
 }
