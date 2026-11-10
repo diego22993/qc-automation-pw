@@ -12,11 +12,6 @@ export class SauceInventoryPage {
     this.productNames = page.locator(".inventory_item_name");
     this.productPrices = page.locator(".inventory_item_price");
   }
-  /*
-  async goto() {
-    await this.page.goto("https://www.saucedemo.com/");
-  }
-*/
   async orderByName(option: string, expectedResult: string) {
     await this.page.locator(".product_sort_container").selectOption(option);
     const firstProductName = await this.page
@@ -69,6 +64,6 @@ export class SauceInventoryPage {
   }
 
   async openInventoryDirectly() {
-    await this.page.goto("https://www.saucedemo.com/inventory.html");
+    await this.page.goto("/inventory.html");
   }
 }
