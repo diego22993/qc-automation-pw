@@ -3,6 +3,7 @@
  * Contiene flujos de autenticación y compra de productos.
  */
 import { expect, test, type Page } from "@playwright/test";
+import { SauceLoginPage } from "../../pages/saucedemo/SauceLoginPage";
 
 // Estas constantes centralizan la URL y las credenciales para reutilizarlas.
 const BASE_URL = "https://www.saucedemo.com/";
@@ -74,16 +75,13 @@ test.describe(
         async ({ page }) => {
           await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
             // Navega al login y confirma que el formulario está disponible.
-            await page.goto(BASE_URL);
-            await expect(page.getByTestId("user-name")).toBeVisible();
+            const sauceLoginPage = new SauceLoginPage(page);
+            await sauceLoginPage.goto();
           });
 
           await test.step("Paso 2: Ingresar credenciales válidas", async () => {
             // Completa ambos campos con el usuario estándar de SauceDemo.
-            await page.getByTestId("user-name").fill(STANDARD_USER);
-            await page.getByTestId("password").fill(PASSWORD);
-            // Envía el formulario de inicio de sesión.
-            await page.getByRole("button", { name: "Login" }).click();
+            ;
           });
 
           await test.step("Paso 3: Verificar que se abrió el inventario", async () => {
@@ -605,9 +603,9 @@ for (const scenario of missingCheckoutFields) {
 
     await test.step(`Paso 2: Dejar vacío el campo ${scenario.field}`, async () => {
       // Llena los otros campos y deja vacío únicamente el campo del escenario.
-      await page.getByTestId("first-name").fill(scenario.firstName);
-      await page.getByTestId("last-name").fill(scenario.lastName);
-      await page.getByTestId("postal-code").fill(scenario.postalCode);
+      await page.getByPlaceholder("First Name").fill(scenario.firstName);
+      await page.getByPlaceholder("Last Name").fill(scenario.lastName);
+      await page.getByPlaceholder("Zip/Postal Code").fill(scenario.postalCode);
       await page.getByRole("button", { name: "Continue" }).click();
     });
 
