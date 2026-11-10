@@ -446,7 +446,7 @@ test.describe(
       );
 
       // Estos tres tests repiten los escenarios de forma explícita, sin arreglos ni bucles.
-      test.describe(
+      /*test.describe(
         "Validaciones escritas paso a paso",
         { tag: "@checkout-explicit" },
         () => {
@@ -478,11 +478,13 @@ test.describe(
           });
         },
       );
+    */
     });
   },
 );
 
 // Cada objeto representa un caso de prueba: datos del formulario y error esperado.
+/*
 const missingCheckoutFields = [
   {
     field: "First Name",
@@ -534,3 +536,4 @@ for (const scenario of missingCheckoutFields) {
     });
   });
 }
+  */

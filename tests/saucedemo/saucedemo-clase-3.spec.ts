@@ -65,7 +65,7 @@ async function openCart(page: Page): Promise<void> {
 // Suite principal: sus etiquetas se heredan en los tests internos.
 test.describe(
   "SauceDemo - Flujos E2E de compra",
-  { tag: ["@saucedemo", "@regression"] },
+  { tag: ["@sauce", "@regression"] },
   () => {
     // Pruebas que verifican acceso, rechazo de acceso y cierre de sesión.
     test.describe("Autenticación", { tag: "@auth" }, () => {
