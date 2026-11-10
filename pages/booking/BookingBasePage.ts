@@ -1,4 +1,4 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 
 export abstract class BookingBasePage {
   readonly page: Page;
@@ -9,6 +9,9 @@ export abstract class BookingBasePage {
 
   async navigate(path: string = '/') {
     await this.page.goto(path, { waitUntil: 'domcontentloaded' });
+    // Booking redirige/recarga la home a los pocos segundos (idioma o verificación anti-bot).
+    // Esperamos a que la red quede quieta para no escribir en una página que se va a recargar.
+    await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
     await this.dismissModalsIfPresent();
   }
 
@@ -16,17 +19,18 @@ export abstract class BookingBasePage {
     // Manejo de banners de Cookies o Popups emergentes comunes en Booking
     const cookieAcceptBtn = this.page.locator('#onetrust-accept-btn-handler');
     const closeSignInModalBtn = this.page.locator('button[aria-label="Dismiss sign-in info."]');
-    
 
+    if (await cookieAcceptBtn.isVisible()) {
+      await cookieAcceptBtn.click();
+    }
+
+    // El modal de login aparece con unos segundos de demora:
+    // esperamos hasta 5s a que aparezca; si no aparece, seguimos normalmente.
     try {
-      if (await cookieAcceptBtn.isVisible({ timeout: 3000 })) {
-        await cookieAcceptBtn.click();
-      }
-      if (await closeSignInModalBtn.isVisible({ timeout: 3000 })) {
-        await closeSignInModalBtn.click();
-      }
-    } catch (error) {
-      // Si no aparecen los modales, continúa la ejecución normalmente
+      await closeSignInModalBtn.waitFor({ state: 'visible', timeout: 5000 });
+      await closeSignInModalBtn.click();
+    } catch {
+      // No apareció el modal
     }
   }
 
