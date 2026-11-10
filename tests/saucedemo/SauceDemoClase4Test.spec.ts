@@ -3,10 +3,15 @@
  * Contiene flujos de autenticación y compra de productos.
  */
 import { expect, test, type Page } from "@playwright/test";
+import { SauceCartPage } from "../../pages/saucedemo/SauceCartPage";
+import { SauceCheckoutCompletePage } from "../../pages/saucedemo/SauceCheckoutComplete";
+import { SauceCheckoutOverviewPage } from "../../pages/saucedemo/SauceCheckoutOverviewPage";
 import { SauceLoginPage } from "../../pages/saucedemo/SauceLoginPage";
+import { SauceInventoryPage } from "../../pages/saucedemo/SauceInventoryPage";
+import { SauceProductDetailPage } from "../../pages/saucedemo/SauceProductDetailPage";
+import { SauceCheckoutInformationPage } from "../../pages/saucedemo/SauceCheckoutInformationPAge";
 
-// Estas constantes centralizan la URL y las credenciales para reutilizarlas.
-const BASE_URL = "https://www.saucedemo.com/";
+// Estas constantes centralizan las credenciales para reutilizarlas.
 const STANDARD_USER = "standard_user";
 const PASSWORD = "secret_sauce";
 
@@ -21,42 +26,23 @@ async function loginTo(
   page: Page,
   username = STANDARD_USER,
   password = PASSWORD,
-): Promise<void> {
-  // instanciar un page de login
+): Promise<SauceInventoryPage> {
   const sauceLoginPage = new SauceLoginPage(page);
   await sauceLoginPage.goto();
   await sauceLoginPage.login(username, password);
   expect(await sauceLoginPage.getInventoryPageVisible()).toBeTruthy();
+  return sauceLoginPage.goToInventoryPage();
 }
 
-/**
- * Objetivo: agregar al carrito el producto cuyo nombre se proporciona.
- * @param page Pestaña de Playwright donde está abierto el inventario.
- * @param productName Nombre visible del producto que se quiere agregar.
- * @returns Una promesa que termina cuando se hace clic en el botón; no devuelve un valor.
- */
-async function addProductToCart(
+async function openCheckoutInformation(
   page: Page,
-  productName: string,
-): Promise<void> {
-  await page
-    // Cada tarjeta representa un producto del inventario.
-    .locator(".inventory_item")
-    // Conserva solo la tarjeta que contiene el nombre solicitado.
-    .filter({ hasText: productName })
-    // Dentro de esa tarjeta busca el botón accesible por su nombre.
-    .getByRole("button", { name: "Add to cart" })
-    // Agrega el producto al carrito.
-    .click();
-}
-
-/**
- * Objetivo: abrir la página del carrito desde el enlace de navegación.
- * @param page Pestaña de Playwright donde está abierta la tienda.
- * @returns Una promesa que termina cuando se hace clic en el enlace; no devuelve un valor.
- */
-async function openCart(page: Page): Promise<void> {
-  await page.locator(".shopping_cart_link").click();
+): Promise<SauceCheckoutInformationPage> {
+  const inventoryPage = new SauceInventoryPage(page);
+  await inventoryPage.addProductToCart("Sauce Labs Backpack");
+  await inventoryPage.openCart();
+  const cartPage = new SauceCartPage(page);
+  await cartPage.checkout();
+  return new SauceCheckoutInformationPage(page);
 }
 
 // Suite principal: sus etiquetas se heredan en los tests internos.
@@ -66,7 +52,7 @@ test.describe(
   () => {
     // Pruebas que verifican acceso, rechazo de acceso y cierre de sesión.
     test.describe("Autenticación", { tag: "@auth" }, () => {
-      test.only(
+      test(
         "Iniciar sesión con credenciales válidas",
         { tag: "@smoke" },
         async ({ page }) => {
@@ -90,75 +76,81 @@ test.describe(
       );
 
       test("Rechazar credenciales inválidas", async ({ page }) => {
+        const sauceLoginPage = new SauceLoginPage(page);
+
         await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
           // Empieza en una página limpia de login.
-          await page.goto(BASE_URL);
+          await sauceLoginPage.goto();
         });
 
         await test.step("Paso 2: Enviar una contraseña incorrecta", async () => {
           // Usa un usuario conocido, pero una contraseña que no es válida.
-          await page.getByTestId("user-name").fill(STANDARD_USER);
-          await page.getByTestId("password").fill("wrong_password");
-          // Envía el formulario para provocar la respuesta de error.
-          await page.getByRole("button", { name: "Login" }).click();
+          // Envía el formulario para provocar la respuesta de error    .
+          await sauceLoginPage.login(STANDARD_USER, "wrong_password");
         });
 
         await test.step("Paso 3: Verificar el mensaje de error", async () => {
           // Confirma el texto del error y que el formulario de login siga visible.
-          await expect(page.locator('[data-test="error"]')).toContainText(
-            "Username and password do not match",
-          );
-          await expect(page.getByTestId("user-name")).toBeVisible();
+          // definimos una constante con el mensaje de error esperado.
+          const msjError =
+            "Epic sadface: Username and password do not match any user in this service";
+          expect(await sauceLoginPage.getErrorMessage()).toContain(msjError);
         });
       });
 
       test("Impedir el acceso al usuario bloqueado", async ({ page }) => {
+        const sauceLoginPage = new SauceLoginPage(page);
         await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
           // Abre el formulario antes de probar el usuario bloqueado.
-          await page.goto(BASE_URL);
+          // invocando el método goto del page object SauceLoginPage.
+          await sauceLoginPage.goto();
         });
 
         await test.step("Paso 2: Intentar ingresar con locked_out_user", async () => {
           // Completa el formulario con el usuario bloqueado y la contraseña de demo.
-          await page.getByTestId("user-name").fill("locked_out_user");
-          await page.getByTestId("password").fill(PASSWORD);
-          // Envía las credenciales para que la aplicación responda.
-          await page.getByRole("button", { name: "Login" }).click();
+          // invocando el método login del page object SauceLoginPage con el usuario bloqueado y la contraseña de demo.
+          await sauceLoginPage.login("locked_out_user", PASSWORD);
         });
 
         await test.step("Paso 3: Verificar que el acceso fue bloqueado", async () => {
           // Comprueba que SauceDemo informa que la cuenta está bloqueada.
-          await expect(page.locator('[data-test="error"]')).toContainText(
-            "Sorry, this user has been locked out",
-          );
+          // definimos una constante con el msj de error
+          const msjError = "Sorry, this user has been locked out";
+          expect(await sauceLoginPage.getErrorMessage()).toContain(msjError);
         });
       });
 
       test("Cerrar sesión e impedir el acceso directo al inventario", async ({
         page,
       }) => {
+        const sauceLoginPage = new SauceLoginPage(page);
         await test.step("Paso 1: Iniciar sesión", async () => {
-          // Reutiliza el helper y confirma que se llegó al inventario.
-          await loginTo(page);
-          await expect(page).toHaveURL(/inventory.html/);
+          // invocando el método goto del page object SauceLoginPage y luego login con usuario estándar y contraseña de demo.
+          await sauceLoginPage.goto();
+          await sauceLoginPage.login(STANDARD_USER, PASSWORD);
+          expect(await sauceLoginPage.getInventoryPageVisible()).toBeTruthy();
         });
 
         await test.step("Paso 2: Cerrar sesión desde el menú", async () => {
           // Abre la navegación lateral y selecciona la opción para salir.
-          await page.getByRole("button", { name: "Open Menu" }).click();
-          await page.locator('[data-test="logout-sidebar-link"]').click();
+          await sauceLoginPage.logout();
         });
 
         await test.step("Paso 3: Verificar el regreso al login", async () => {
           // La presencia del campo de usuario confirma que terminó la sesión.
-          await expect(page.getByTestId("user-name")).toBeVisible();
+          // invocamos los métodos del page object SauceLoginPage para verificar la visibilidad de los campos y el botón de login.
+          expect(await sauceLoginPage.isUsernameVisible()).toBeTruthy();
+          expect(await sauceLoginPage.isPasswordVisible()).toBeTruthy();
+          expect(await sauceLoginPage.isLoginButtonVisible()).toBeTruthy();
         });
 
         await test.step("Paso 4: Verificar que el inventario requiere autenticación", async () => {
           // Intenta abrir directamente una ruta protegida después de salir.
-          await page.goto(`${BASE_URL}inventory.html`);
-          // Confirma que el sitio redirige al formulario de acceso.
-          await expect(page.getByTestId("user-name")).toBeVisible();
+          await new SauceInventoryPage(page).openInventoryDirectly();
+          // Confirma que el sitio redirige al formulario de acceso.();
+          expect(await sauceLoginPage.isUsernameVisible()).toBeTruthy();
+          expect(await sauceLoginPage.isPasswordVisible()).toBeTruthy();
+          expect(await sauceLoginPage.isLoginButtonVisible()).toBeTruthy();
         });
       });
     });
@@ -166,27 +158,28 @@ test.describe(
     // Suite para las opciones de ordenamiento y el detalle de producto.
     test.describe("Inventario", { tag: "@inventory" }, () => {
       test.beforeEach(async ({ page }) => {
+        const sauceLoginPage = new SauceLoginPage(page);
+
         await test.step("Preparación: Iniciar sesión", async () => {
-          // Cada test empieza con su propia sesión para no depender de otro test.
-          await loginTo(page);
-          await expect(page).toHaveURL(/inventory.html/);
+          // instanciar un objeto de la clase SauceLoginPage y realizar el login.
+          await sauceLoginPage.goto();
+          await sauceLoginPage.login(STANDARD_USER, PASSWORD);
+          await sauceLoginPage.getInventoryPageVisible();
         });
       });
 
       test("Ordenar productos por nombre y precio", async ({ page }) => {
         // Estos locators representan los nombres y precios visibles del inventario.
-        const productNames = page.locator(".inventory_item_name");
-        const productPrices = page.locator(".inventory_item_price");
+        // instaciar un SauceInventoryPage para interactuar con la página de inventario.
+        const sauceLoginPage = new SauceLoginPage(page);
+        const sauceInventoryPage = await sauceLoginPage.goToInventoryPage();
 
         await test.step("Paso 1: Ordenar nombres de A a Z", async () => {
           // El valor "az" selecciona el orden alfabético ascendente.
-          await page.locator(".product_sort_container").selectOption("az");
-          // Primero verifica la opción seleccionada en el control.
-          await expect(page.locator(".product_sort_container")).toHaveValue(
-            "az",
-          );
-          // Luego comprueba que los nombres visibles estén realmente en ese orden.
-          await expect(productNames).toHaveText([
+          await sauceInventoryPage.orderByName("az", "Sauce Labs Backpack");
+
+          const productNames = await sauceInventoryPage.getProductNames();
+          await expect(productNames).toEqual([
             "Sauce Labs Backpack",
             "Sauce Labs Bike Light",
             "Sauce Labs Bolt T-Shirt",
@@ -198,13 +191,12 @@ test.describe(
 
         await test.step("Paso 2: Ordenar nombres de Z a A", async () => {
           // El valor "za" selecciona el orden alfabético descendente.
-          await page.locator(".product_sort_container").selectOption("za");
-          // Primero verifica la opción seleccionada en el control.
-          await expect(page.locator(".product_sort_container")).toHaveValue(
+          await sauceInventoryPage.orderByName(
             "za",
+            "Test.allTheThings() T-Shirt (Red)",
           );
-          // Luego comprueba que los nombres visibles estén realmente en orden inverso.
-          await expect(productNames).toHaveText([
+          const productNames = await sauceInventoryPage.getProductNames();
+          await expect(productNames).toEqual([
             "Test.allTheThings() T-Shirt (Red)",
             "Sauce Labs Onesie",
             "Sauce Labs Fleece Jacket",
@@ -216,12 +208,9 @@ test.describe(
 
         await test.step("Paso 3: Ordenar precios de menor a mayor", async () => {
           // El valor "lohi" ordena los precios de menor a mayor.
-          await page.locator(".product_sort_container").selectOption("lohi");
-          // Verifica la opción seleccionada y el orden visible de los precios.
-          await expect(page.locator(".product_sort_container")).toHaveValue(
-            "lohi",
-          );
-          await expect(productPrices).toHaveText([
+          await sauceInventoryPage.orderByPrice("lohi", "$7.99");
+          const productPrices = await sauceInventoryPage.getProductPrices();
+          await expect(productPrices).toEqual([
             "$7.99",
             "$9.99",
             "$15.99",
@@ -233,12 +222,9 @@ test.describe(
 
         await test.step("Paso 4: Ordenar precios de mayor a menor", async () => {
           // El valor "hilo" ordena los precios de mayor a menor.
-          await page.locator(".product_sort_container").selectOption("hilo");
-          // Verifica la opción seleccionada y el orden visible de mayor a menor.
-          await expect(page.locator(".product_sort_container")).toHaveValue(
-            "hilo",
-          );
-          await expect(productPrices).toHaveText([
+          await sauceInventoryPage.orderByPrice("hilo", "$49.99");
+          const productPrices = await sauceInventoryPage.getProductPrices();
+          await expect(productPrices).toEqual([
             "$49.99",
             "$29.99",
             "$15.99",
@@ -252,30 +238,33 @@ test.describe(
       test("Abrir el detalle de un producto y regresar al inventario", async ({
         page,
       }) => {
+        const sauceInventoryPage = new SauceInventoryPage(page);
+        const sauceProductDetailPage = new SauceProductDetailPage(page);
+
         await test.step("Paso 1: Abrir el detalle de Sauce Labs Backpack", async () => {
-          // El nombre es texto dentro de la tarjeta, no un enlace; por eso buscamos texto exacto.
-          await page.getByText("Sauce Labs Backpack", { exact: true }).click();
-          // Comprueba que se abrió la página de detalle del producto con id 4.
-          await expect(page).toHaveURL(/inventory-item.html\?id=4/);
+          await sauceInventoryPage.openProductDetail("Sauce Labs Backpack");
+          expect(await sauceProductDetailPage.validateUrl()).toBeTruthy();
         });
 
         await test.step("Paso 2: Verificar la información del producto", async () => {
-          // Confirma que el nombre y la acción de agregar al carrito están disponibles.
-          await expect(
-            page.getByText("Sauce Labs Backpack", { exact: true }),
-          ).toBeVisible();
-          await expect(
-            page.getByRole("button", { name: "Add to cart" }),
-          ).toBeVisible();
+          // invocar métodos de instancia de SauceProductDetailPage para verificar visibilidad de elementos
+          expect(
+            await sauceProductDetailPage.isProductNameVisible(),
+          ).toBeTruthy();
+          expect(
+            await sauceProductDetailPage.isProductDescriptionVisible(),
+          ).toBeTruthy();
+          expect(
+            await sauceProductDetailPage.isProductPriceVisible(),
+          ).toBeTruthy();
+          expect(
+            await sauceProductDetailPage.isAddToCartButtonVisible(),
+          ).toBeTruthy();
         });
 
         await test.step("Paso 3: Regresar al inventario", async () => {
-          // Usa el botón de regreso del detalle y valida que volvió el catálogo.
-          await page.getByRole("button", { name: "Back to products" }).click();
+          await sauceProductDetailPage.goBackToProducts();
           await expect(page).toHaveURL(/inventory.html/);
-          await expect(
-            page.getByRole("link", { name: "Sauce Labs Backpack" }),
-          ).toBeVisible();
         });
       });
     });
@@ -283,69 +272,64 @@ test.describe(
     // Suite para agregar, quitar y conservar artículos del carrito.
     test.describe("Carrito", { tag: "@cart" }, () => {
       test.beforeEach(async ({ page }) => {
-        await test.step("Preparación: Iniciar sesión", async () => {
-          // Aísla cada prueba comenzando desde el inventario con la sesión iniciada.
-          await loginTo(page);
-          await expect(page).toHaveURL(/inventory.html/);
-        });
+        await loginTo(page);
       });
 
       test("Agregar y quitar productos del carrito", async ({ page }) => {
+        const inventoryPage = new SauceInventoryPage(page);
+        const cartPage = new SauceCartPage(page);
+
         await test.step("Paso 1: Agregar Sauce Labs Backpack", async () => {
-          // Agrega un producto concreto y revisa que el contador indique uno.
-          await addProductToCart(page, "Sauce Labs Backpack");
-          await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
+          await inventoryPage.addProductToCart("Sauce Labs Backpack");
+          await expect.poll(() => inventoryPage.getCartBadgeText()).toBe("1");
         });
 
         await test.step("Paso 2: Abrir el carrito y verificar el producto", async () => {
-          // Navega al carrito y comprueba cantidad y nombre del producto.
-          await openCart(page);
-          await expect(page.locator(".cart_item")).toHaveCount(1);
-          await expect(page.locator(".cart_item")).toContainText(
-            "Sauce Labs Backpack",
-          );
+          await inventoryPage.openCart();
+          await expect.poll(() => cartPage.getItemCount()).toBe(1);
+          await expect
+            .poll(() => cartPage.getItemNames())
+            .toContain("Sauce Labs Backpack");
         });
 
         await test.step("Paso 3: Quitar el producto", async () => {
-          // Quita la fila del producto y verifica que fila y contador desaparecieron.
-          await page.getByRole("button", { name: "Remove" }).click();
-          await expect(page.locator(".cart_item")).toHaveCount(0);
-          await expect(page.locator(".shopping_cart_badge")).toHaveCount(0);
+          await cartPage.removeProduct("Sauce Labs Backpack");
+          await expect.poll(() => cartPage.getItemCount()).toBe(0);
+          await expect.poll(() => cartPage.isCartBadgeVisible()).toBe(false);
         });
       });
 
       test("Conservar productos al navegar entre inventario y carrito", async ({
         page,
       }) => {
+        const inventoryPage = new SauceInventoryPage(page);
+        const cartPage = new SauceCartPage(page);
+
         await test.step("Paso 1: Agregar dos productos", async () => {
-          // Agrega artículos distintos y comprueba el total mostrado en el badge.
-          await addProductToCart(page, "Sauce Labs Backpack");
-          await addProductToCart(page, "Sauce Labs Bike Light");
-          await expect(page.locator(".shopping_cart_badge")).toHaveText("2");
+          await inventoryPage.addProductToCart("Sauce Labs Backpack");
+          await inventoryPage.addProductToCart("Sauce Labs Bike Light");
+          await expect(await inventoryPage.getCartBadgeText()).toBe("2");
         });
 
         await test.step("Paso 2: Verificar ambos productos en el carrito", async () => {
-          await openCart(page);
-          // Comprueba que haya dos filas y que cada producto aparezca en ellas.
-          await expect(page.locator(".cart_item")).toHaveCount(2);
-          await expect(page.locator(".cart_item")).toContainText([
+          await inventoryPage.openCart();
+          await expect(await cartPage.getItemCount()).toBe(2);
+          await expect(await cartPage.getItemNames()).toEqual([
             "Sauce Labs Backpack",
             "Sauce Labs Bike Light",
           ]);
         });
 
         await test.step("Paso 3: Volver al inventario", async () => {
-          // Regresa al catálogo y comprueba que el contador conserve ambos productos.
-          await page.getByRole("button", { name: "Continue Shopping" }).click();
+          await cartPage.continueShopping();
           await expect(page).toHaveURL(/inventory.html/);
-          await expect(page.locator(".shopping_cart_badge")).toHaveText("2");
+          await expect(await inventoryPage.getCartBadgeText()).toBe("2");
         });
 
         await test.step("Paso 4: Confirmar que los productos siguen en el carrito", async () => {
-          await openCart(page);
-          // Vuelve a comprobar ambas filas después de navegar fuera y regresar.
-          await expect(page.locator(".cart_item")).toHaveCount(2);
-          await expect(page.locator(".cart_item")).toContainText([
+          await inventoryPage.openCart();
+          await expect(await cartPage.getItemCount()).toBe(2);
+          await expect(await cartPage.getItemNames()).toEqual([
             "Sauce Labs Backpack",
             "Sauce Labs Bike Light",
           ]);
@@ -356,66 +340,57 @@ test.describe(
     // Suite para completar una compra y verificar errores de datos obligatorios.
     test.describe("Checkout", { tag: "@checkout" }, () => {
       test.beforeEach(async ({ page }) => {
-        await test.step("Preparación: Iniciar sesión", async () => {
-          // Cada caso comienza en el inventario, sin depender de otros casos.
-          await loginTo(page);
-          await expect(page).toHaveURL(/inventory.html/);
-        });
+        await loginTo(page);
       });
 
       test(
         "Completar la compra de dos productos",
         { tag: "@smoke" },
         async ({ page }) => {
+          const inventoryPage = new SauceInventoryPage(page);
+          const cartPage = new SauceCartPage(page);
+
           await test.step("Paso 1: Agregar dos productos al carrito", async () => {
-            // Agrega los productos que usará este escenario de compra.
-            await addProductToCart(page, "Sauce Labs Backpack");
-            await addProductToCart(page, "Sauce Labs Bike Light");
-            await expect(page.locator(".shopping_cart_badge")).toHaveText("2");
+            await inventoryPage.addProductToCart("Sauce Labs Backpack");
+            await inventoryPage.addProductToCart("Sauce Labs Bike Light");
+            await expect(await inventoryPage.getCartBadgeText()).toBe("2");
           });
 
           await test.step("Paso 2: Revisar el carrito y comenzar el checkout", async () => {
-            // Abre el carrito, revisa su contenido y avanza al formulario.
-            await openCart(page);
-            await expect(page.locator(".cart_item")).toHaveCount(2);
-            await expect(page.locator(".cart_item")).toContainText([
+            await inventoryPage.openCart();
+            await expect(await cartPage.getItemCount()).toBe(2);
+            await expect(await cartPage.getItemNames()).toEqual([
               "Sauce Labs Backpack",
               "Sauce Labs Bike Light",
             ]);
-            await page.getByRole("button", { name: "Checkout" }).click();
+            await cartPage.checkout();
             await expect(page).toHaveURL(/checkout-step-one.html/);
           });
 
           await test.step("Paso 3: Completar los datos del comprador", async () => {
-            // Completa los campos obligatorios y avanza al resumen.
-            await page.getByTestId("first-name").fill("Ada");
-            await page.getByTestId("last-name").fill("Lovelace");
-            await page.getByTestId("postal-code").fill("12345");
-            await page.getByRole("button", { name: "Continue" }).click();
+            const informationPage = new SauceCheckoutInformationPage(page);
+            await informationPage.fillData("Ada", "Lovelace", "12345");
             await expect(page).toHaveURL(/checkout-step-two.html/);
           });
 
           await test.step("Paso 4: Verificar productos y totales", async () => {
-            // Comprueba cantidad de artículos y los cálculos del subtotal, impuesto y total.
-            await expect(page.locator(".cart_item")).toHaveCount(2);
-            await expect(page.locator(".summary_subtotal_label")).toHaveText(
-              "Item total: $39.98",
-            );
-            await expect(page.locator(".summary_tax_label")).toHaveText(
-              "Tax: $3.20",
-            );
-            await expect(page.locator(".summary_total_label")).toHaveText(
-              "Total: $43.18",
-            );
+            const overviewPage = new SauceCheckoutOverviewPage(page);
+            expect(await overviewPage.getItemCount()).toBe(2);
+            expect(await overviewPage.getSubtotal()).toBe("Item total: $39.98");
+            expect(await overviewPage.getTax()).toBe("Tax: $3.20");
+            expect(await overviewPage.getTotal()).toBe("Total: $43.18");
           });
 
           await test.step("Paso 5: Finalizar y validar la confirmación", async () => {
-            // Finaliza el flujo y espera el mensaje que confirma la compra.
-            await page.getByRole("button", { name: "Finish" }).click();
+            await new SauceCheckoutOverviewPage(page).finish();
             await expect(page).toHaveURL(/checkout-complete.html/);
-            await expect(
-              page.getByRole("heading", { name: "Thank you for your order!" }),
-            ).toBeVisible();
+            const completePage = new SauceCheckoutCompletePage(page);
+            expect(await completePage.getCompleteHeaderText()).toBe(
+              "Thank you for your order!",
+            );
+            expect(await completePage.isBackToHomeButtonVisible()).toBe(true);
+            await completePage.backToHome();
+            await expect(page).toHaveURL(/inventory.html/);
           });
         },
       );
@@ -423,53 +398,49 @@ test.describe(
       test(
         "Completar checkout y descargar el PDF de la orden",
         { tag: "@pdf" },
-        async ({ page }, testInfo) => {
+        async ({ page }) => {
+          const inventoryPage = new SauceInventoryPage(page);
+          const cartPage = new SauceCartPage(page);
+
           await test.step("Paso 1: Agregar un producto al carrito", async () => {
-            // Agrega un producto conocido para que el pedido tenga contenido.
-            await addProductToCart(page, "Sauce Labs Backpack");
-            await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
+            await inventoryPage.addProductToCart("Sauce Labs Backpack");
+            await expect(await inventoryPage.getCartBadgeText()).toBe("1");
           });
 
           await test.step("Paso 2: Abrir el carrito e iniciar el checkout", async () => {
-            // Revisa que el producto esté en el carrito antes de continuar.
-            await openCart(page);
-            await expect(page.locator(".cart_item")).toContainText(
+            await inventoryPage.openCart();
+            await expect(await cartPage.getItemNames()).toContain(
               "Sauce Labs Backpack",
             );
-            await page.getByRole("button", { name: "Checkout" }).click();
+            await cartPage.checkout();
             await expect(page).toHaveURL(/checkout-step-one.html/);
           });
 
           await test.step("Paso 3: Completar los datos del comprador", async () => {
-            // Llena todos los campos obligatorios para poder avanzar.
-            await page.getByTestId("first-name").fill("Ada");
-            await page.getByTestId("last-name").fill("Lovelace");
-            await page.getByTestId("postal-code").fill("12345");
-            await page.getByRole("button", { name: "Continue" }).click();
+            await new SauceCheckoutInformationPage(page).fillData(
+              "Ada",
+              "Lovelace",
+              "12345",
+            );
             await expect(page).toHaveURL(/checkout-step-two.html/);
           });
 
           await test.step("Paso 4: Confirmar el resumen de la orden", async () => {
-            // Verifica que el producto elegido llegue al resumen del checkout.
-            await expect(page.locator(".cart_item")).toContainText(
-              "Sauce Labs Backpack",
-            );
+            await expect(
+              await new SauceCheckoutOverviewPage(page).getItemNames(),
+            ).toContain("Sauce Labs Backpack");
           });
 
           await test.step("Paso 5: Finalizar la compra", async () => {
-            // Finish crea la confirmación que ofrece la opción de generar el PDF.
-            await page.getByRole("button", { name: "Finish" }).click();
+            await new SauceCheckoutOverviewPage(page).finish();
             await expect(page).toHaveURL(/checkout-complete.html/);
             await expect(
-              page.getByRole("heading", { name: "Thank you for your order!" }),
-            ).toBeVisible();
+              await new SauceCheckoutCompletePage(page).getCompleteHeaderText(),
+            ).toBe("Thank you for your order!");
           });
 
           await test.step("Paso 6: Generar y validar el PDF descargado", async () => {
-            // Espera el evento antes del clic para no perder una descarga rápida.
-            await page
-              .getByRole("button", { name: "Generate PDF order" })
-              .click();
+            await new SauceCheckoutCompletePage(page).generatePDF();
           });
         },
       );
@@ -480,78 +451,30 @@ test.describe(
         { tag: "@checkout-explicit" },
         () => {
           test("Validar checkout sin nombre", async ({ page }) => {
-            await test.step("Paso 1: Abrir el formulario de checkout", async () => {
-              // Agrega un producto y navega desde el carrito hasta el formulario.
-              await addProductToCart(page, "Sauce Labs Backpack");
-              await openCart(page);
-              await page.getByRole("button", { name: "Checkout" }).click();
-              await expect(page).toHaveURL(/checkout-step-one.html/);
-            });
-
-            await test.step("Paso 2: Dejar vacío el nombre y enviar el formulario", async () => {
-              // Completa apellido y código postal, pero no ingresa el nombre.
-              await page.getByTestId("first-name").fill("");
-              await page.getByTestId("last-name").fill("Lovelace");
-              await page.getByTestId("postal-code").fill("12345");
-              await page.getByRole("button", { name: "Continue" }).click();
-            });
-
-            await test.step("Paso 3: Verificar el error de nombre obligatorio", async () => {
-              await expect(page.locator('[data-test="error"]')).toHaveText(
-                "Error: First Name is required",
-              );
-              await expect(page).toHaveURL(/checkout-step-one.html/);
-            });
+            const informationPage = await openCheckoutInformation(page);
+            await informationPage.fillData("", "Lovelace", "12345");
+            await expect(await informationPage.getErrorMessage()).toBe(
+              "Error: First Name is required",
+            );
+            await expect(page).toHaveURL(/checkout-step-one.html/);
           });
 
           test("Validar checkout sin apellido", async ({ page }) => {
-            await test.step("Paso 1: Abrir el formulario de checkout", async () => {
-              // Agrega un producto y navega desde el carrito hasta el formulario.
-              await addProductToCart(page, "Sauce Labs Backpack");
-              await openCart(page);
-              await page.getByRole("button", { name: "Checkout" }).click();
-              await expect(page).toHaveURL(/checkout-step-one.html/);
-            });
-
-            await test.step("Paso 2: Dejar vacío el apellido y enviar el formulario", async () => {
-              // Completa nombre y código postal, pero no ingresa el apellido.
-              await page.getByTestId("first-name").fill("Ada");
-              await page.getByTestId("last-name").fill("");
-              await page.getByTestId("postal-code").fill("12345");
-              await page.getByRole("button", { name: "Continue" }).click();
-            });
-
-            await test.step("Paso 3: Verificar el error de apellido obligatorio", async () => {
-              await expect(page.locator('[data-test="error"]')).toHaveText(
-                "Error: Last Name is required",
-              );
-              await expect(page).toHaveURL(/checkout-step-one.html/);
-            });
+            const informationPage = await openCheckoutInformation(page);
+            await informationPage.fillData("Ada", "", "12345");
+            await expect(await informationPage.getErrorMessage()).toBe(
+              "Error: Last Name is required",
+            );
+            await expect(page).toHaveURL(/checkout-step-one.html/);
           });
 
           test("Validar checkout sin código postal", async ({ page }) => {
-            await test.step("Paso 1: Abrir el formulario de checkout", async () => {
-              // Agrega un producto y navega desde el carrito hasta el formulario.
-              await addProductToCart(page, "Sauce Labs Backpack");
-              await openCart(page);
-              await page.getByRole("button", { name: "Checkout" }).click();
-              await expect(page).toHaveURL(/checkout-step-one.html/);
-            });
-
-            await test.step("Paso 2: Dejar vacío el código postal y enviar el formulario", async () => {
-              // Completa nombre y apellido, pero no ingresa el código postal.
-              await page.getByTestId("first-name").fill("Ada");
-              await page.getByTestId("last-name").fill("Lovelace");
-              await page.getByTestId("postal-code").fill("");
-              await page.getByRole("button", { name: "Continue" }).click();
-            });
-
-            await test.step("Paso 3: Verificar el error de código postal obligatorio", async () => {
-              await expect(page.locator('[data-test="error"]')).toHaveText(
-                "Error: Postal Code is required",
-              );
-              await expect(page).toHaveURL(/checkout-step-one.html/);
-            });
+            const informationPage = await openCheckoutInformation(page);
+            await informationPage.fillData("Ada", "Lovelace", "");
+            await expect(await informationPage.getErrorMessage()).toBe(
+              "Error: Postal Code is required",
+            );
+            await expect(page).toHaveURL(/checkout-step-one.html/);
           });
         },
       );
@@ -588,25 +511,23 @@ const missingCheckoutFields = [
 for (const scenario of missingCheckoutFields) {
   // Playwright registra un test independiente usando los datos del escenario actual.
   test(`Validar checkout sin completar ${scenario.field}`, async ({ page }) => {
+    await loginTo(page);
+    const informationPage = await openCheckoutInformation(page);
+
     await test.step("Paso 1: Abrir el formulario de checkout", async () => {
-      // Prepara un producto y navega hasta el formulario de datos.
-      await addProductToCart(page, "Sauce Labs Backpack");
-      await openCart(page);
-      await page.getByRole("button", { name: "Checkout" }).click();
       await expect(page).toHaveURL(/checkout-step-one.html/);
     });
 
     await test.step(`Paso 2: Dejar vacío el campo ${scenario.field}`, async () => {
-      // Llena los otros campos y deja vacío únicamente el campo del escenario.
-      await page.getByPlaceholder("First Name").fill(scenario.firstName);
-      await page.getByPlaceholder("Last Name").fill(scenario.lastName);
-      await page.getByPlaceholder("Zip/Postal Code").fill(scenario.postalCode);
-      await page.getByRole("button", { name: "Continue" }).click();
+      await informationPage.fillData(
+        scenario.firstName,
+        scenario.lastName,
+        scenario.postalCode,
+      );
     });
 
     await test.step("Paso 3: Verificar que no se avance y se muestre el error", async () => {
-      // Confirma que aparece el mensaje correcto y que seguimos en el formulario.
-      await expect(page.locator('[data-test="error"]')).toHaveText(
+      await expect(await informationPage.getErrorMessage()).toBe(
         scenario.message,
       );
       await expect(page).toHaveURL(/checkout-step-one.html/);
