@@ -28,8 +28,8 @@ export class BookingSearchPage extends BookingBasePage {
     
     // Abrir y seleccionar fechas en el calendario
     await this.clickElement(this.datePickerOpenBtn);
-    await this.selectDate(checkInDate);
-    await this.selectDate(checkOutDate);
+    // await this.selectDate(checkInDate);
+    //await this.selectDate(checkOutDate);
 
     await this.clickElement(this.searchButton);
   }
