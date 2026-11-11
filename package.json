@@ -15,7 +15,8 @@
     "debug:saucedemo": "npx playwright test --debug --grep @saucedemo",
     "test:ui:saucedemo": "npx playwright test --ui --grep @saucedemo",
     "test:saucedemo": "npx playwright test --grep @saucedemo",
-    "test:report": "npx playwright show-report"
+    "test:report": "npx playwright show-report",
+    "test:dp": "npx playwright test --ui grep @saucedemo-data-provider"
   },
   "repository": {
     "type": "git",

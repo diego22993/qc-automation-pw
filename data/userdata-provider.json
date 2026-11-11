@@ -1,0 +1,34 @@
+{
+    "standard": {
+        "scenario": "Usuario estándar",
+        "userName": "standard_user",
+        "password": "secret_sauce",
+        "expectSuccess": true
+    },
+    "lockedOut": {
+        "scenario": "Usuario bloqueado",
+        "userName": "locked_out_user",
+        "password": "secret_sauce",
+        "expectSuccess": false,
+        "msjError": "Epic sadface: Sorry, this user has been locked out."
+    },
+    "problemUser": {
+        "scenario": "Usuario problemático",
+        "userName": "problem_user",
+        "password": "secret_sauce",
+        "expectSuccess": true
+    },
+    "performanceGlitchUser": {
+        "scenario": "Usuario con problema de rendimiento",
+        "userName": "performance_glitch_user",
+        "password": "secret_sauce",
+        "expectSuccess": true
+    },
+    "visualUser": {
+        "scenario": "Usuario visual",
+        "userName": "visual_user",
+        "password": "secret_sauce",
+        "expectSuccess": true,
+        "msjError": ""
+    }
+}

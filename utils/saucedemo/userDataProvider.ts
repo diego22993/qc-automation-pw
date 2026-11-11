@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { parse } from "csv-parse/sync";
 
 export type LoginOutcome = "success" | "locked_out";
 
@@ -8,29 +7,41 @@ export interface SauceDemoUser {
   username: string;
   password: string;
   expectedOutcome: LoginOutcome;
+  scenario?: string;
+}
+
+interface JsonUserRecord {
+  scenario?: string;
+  userName?: string;
+  username?: string;
+  password?: string;
+  expectSuccess?: boolean;
+  expectedOutcome?: string;
 }
 
 export function loadSauceDemoUsers(): SauceDemoUser[] {
-  const csvPath = resolve(process.cwd(), "data", "saucedemo-users.csv");
-  const records = parse(readFileSync(csvPath), {
-    columns: true,
-    skip_empty_lines: true,
-    trim: true,
-  }) as Record<string, string>[];
+  const jsonPath = resolve(process.cwd(), "data", "userdata-provider.json");
+  const raw = JSON.parse(readFileSync(jsonPath, "utf-8")) as Record<string, JsonUserRecord>;
 
-  return records.map((record, index) => {
-    const { username, password, expectedOutcome } = record;
+  return Object.values(raw).map((record, index) => {
+    const username = record.userName ?? record.username;
+    const password = record.password;
+    const expectedOutcome =
+      record.expectedOutcome === "locked_out" || record.expectedOutcome === "success"
+        ? record.expectedOutcome
+        : record.expectSuccess === false
+          ? "locked_out"
+          : "success";
 
     if (!username || !password) {
-      throw new Error(`Fila ${index + 2} del CSV: username y password son obligatorios.`);
+      throw new Error(`Registro ${index + 1} del JSON: username y password son obligatorios.`);
     }
 
-    if (expectedOutcome !== "success" && expectedOutcome !== "locked_out") {
-      throw new Error(
-        `Fila ${index + 2} del CSV: expectedOutcome debe ser "success" o "locked_out".`,
-      );
-    }
-
-    return { username, password, expectedOutcome };
+    return {
+      username,
+      password,
+      expectedOutcome,
+      scenario: record.scenario,
+    };
   });
 }
