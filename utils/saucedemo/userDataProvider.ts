@@ -1,36 +1,55 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { parse } from "csv-parse/sync";
 
-export type LoginOutcome = "success" | "locked_out";
-
-export interface SauceDemoUser {
-  username: string;
+export interface UserDataProvider {
+  scenario: string;
+  userName: string;
   password: string;
-  expectedOutcome: LoginOutcome;
+  expectSuccess: boolean;
+  msjError: string;
 }
 
-export function loadSauceDemoUsers(): SauceDemoUser[] {
-  const csvPath = resolve(process.cwd(), "data", "saucedemo-users.csv");
-  const records = parse(readFileSync(csvPath), {
-    columns: true,
-    skip_empty_lines: true,
-    trim: true,
-  }) as Record<string, string>[];
+export function loadUserDataProvider(): UserDataProvider[] {
+  const jsonPath = resolve(process.cwd(), "data", "userdata-provider.json");
+  const rawData: unknown = JSON.parse(readFileSync(jsonPath, "utf8"));
 
-  return records.map((record, index) => {
-    const { username, password, expectedOutcome } = record;
+  if (!rawData || typeof rawData !== "object" || Array.isArray(rawData)) {
+    throw new Error("El archivo userdata-provider.json debe contener un objeto de escenarios.");
+  }
 
-    if (!username || !password) {
-      throw new Error(`Fila ${index + 2} del CSV: username y password son obligatorios.`);
+  return Object.entries(rawData as Record<string, unknown>).map(([key, value]) => {
+    if (!key.trim()) {
+      throw new Error("Cada escenario de userdata-provider.json debe tener una clave no vacía.");
     }
 
-    if (expectedOutcome !== "success" && expectedOutcome !== "locked_out") {
-      throw new Error(
-        `Fila ${index + 2} del CSV: expectedOutcome debe ser "success" o "locked_out".`,
-      );
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      throw new Error(`El escenario "${key}" debe ser un objeto.`);
     }
 
-    return { username, password, expectedOutcome };
+    const user = value as Record<string, unknown>;
+    const { scenario, userName, password, expectSuccess, msjError } = user;
+
+    if (
+      typeof scenario !== "string" ||
+      !scenario.trim() ||
+      typeof userName !== "string" ||
+      !userName.trim() ||
+      typeof password !== "string" ||
+      !password.trim() ||
+      typeof expectSuccess !== "boolean" ||
+      typeof msjError !== "string"
+    ) {
+      throw new Error(`El escenario "${key}" no cumple el contrato de UserDataProvider.`);
+    }
+
+    if (expectSuccess && msjError.trim()) {
+      throw new Error(`El escenario exitoso "${key}" no debe definir un mensaje de error.`);
+    }
+
+    if (!expectSuccess && !msjError.trim()) {
+      throw new Error(`El escenario fallido "${key}" debe definir msjError.`);
+    }
+
+    return { scenario, userName, password, expectSuccess, msjError };
   });
 }
