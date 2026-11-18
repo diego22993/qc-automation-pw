@@ -11,12 +11,16 @@ export interface SauceDemoUser {
 }
 
 export function loadSauceDemoUsers(): SauceDemoUser[] {
-  const csvPath = resolve(process.cwd(), "data", "saucedemo-users.csv");
-  const records = parse(readFileSync(csvPath), {
+  const csvPath = resolve(__dirname, "../../data/saucedemo-users.csv");
+  const records = parse(readFileSync(csvPath, "utf8"), {
     columns: true,
     skip_empty_lines: true,
     trim: true,
   }) as Record<string, string>[];
+
+  if (records.length === 0) {
+    throw new Error("El CSV de usuarios debe contener al menos un escenario.");
+  }
 
   return records.map((record, index) => {
     const { username, password, expectedOutcome } = record;
