@@ -22,14 +22,9 @@ async function loginTo(
   username = STANDARD_USER,
   password = PASSWORD,
 ): Promise<void> {
-  // Abre la tienda antes de interactuar con los campos de acceso.
-  await page.goto(BASE_URL);
-  // Busca el campo por su texto de ayuda y escribe el usuario.
-  await page.getByTestId("user-name").fill(username);
-  // Escribe la contraseña en el campo correspondiente.
-  await page.getByTestId("password").fill(password);
-  // Hace clic en el botón y espera a que Playwright complete la acción.
-  await page.getByRole("button", { name: "Login" }).click();
+  const sauceLoginPage = new SauceLoginPage(page);
+  await sauceLoginPage.goto();
+  await sauceLoginPage.login(username, password);
 }
 
 /**
@@ -73,15 +68,16 @@ test.describe(
         "Iniciar sesión con credenciales válidas",
         { tag: "@smoke" },
         async ({ page }) => {
+          const sauceLoginPage = new SauceLoginPage(page);
+
           await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
             // Navega al login y confirma que el formulario está disponible.
-            const sauceLoginPage = new SauceLoginPage(page);
             await sauceLoginPage.goto();
           });
 
           await test.step("Paso 2: Ingresar credenciales válidas", async () => {
             // Completa ambos campos con el usuario estándar de SauceDemo.
-            ;
+            await sauceLoginPage.login(STANDARD_USER, PASSWORD);
           });
 
           await test.step("Paso 3: Verificar que se abrió el inventario", async () => {
@@ -102,8 +98,8 @@ test.describe(
 
         await test.step("Paso 2: Enviar una contraseña incorrecta", async () => {
           // Usa un usuario conocido, pero una contraseña que no es válida.
-          await page.getByTestId("user-name").fill(STANDARD_USER);
-          await page.getByTestId("password").fill("wrong_password");
+          await page.locator('[data-test="username"]').fill(STANDARD_USER);
+          await page.locator('[data-test="password"]').fill("wrong_password");
           // Envía el formulario para provocar la respuesta de error.
           await page.getByRole("button", { name: "Login" }).click();
         });
@@ -113,7 +109,7 @@ test.describe(
           await expect(page.locator('[data-test="error"]')).toContainText(
             "Username and password do not match",
           );
-          await expect(page.getByTestId("user-name")).toBeVisible();
+          await expect(page.locator('[data-test="username"]')).toBeVisible();
         });
       });
 
@@ -125,8 +121,8 @@ test.describe(
 
         await test.step("Paso 2: Intentar ingresar con locked_out_user", async () => {
           // Completa el formulario con el usuario bloqueado y la contraseña de demo.
-          await page.getByTestId("user-name").fill("locked_out_user");
-          await page.getByTestId("password").fill(PASSWORD);
+          await page.locator('[data-test="username"]').fill("locked_out_user");
+          await page.locator('[data-test="password"]').fill(PASSWORD);
           // Envía las credenciales para que la aplicación responda.
           await page.getByRole("button", { name: "Login" }).click();
         });
@@ -156,14 +152,14 @@ test.describe(
 
         await test.step("Paso 3: Verificar el regreso al login", async () => {
           // La presencia del campo de usuario confirma que terminó la sesión.
-          await expect(page.getByTestId("user-name")).toBeVisible();
+          await expect(page.locator('[data-test="username"]')).toBeVisible();
         });
 
         await test.step("Paso 4: Verificar que el inventario requiere autenticación", async () => {
           // Intenta abrir directamente una ruta protegida después de salir.
           await page.goto(`${BASE_URL}inventory.html`);
           // Confirma que el sitio redirige al formulario de acceso.
-          await expect(page.getByTestId("user-name")).toBeVisible();
+          await expect(page.locator('[data-test="username"]')).toBeVisible();
         });
       });
     });
@@ -279,7 +275,7 @@ test.describe(
           await page.getByRole("button", { name: "Back to products" }).click();
           await expect(page).toHaveURL(/inventory.html/);
           await expect(
-            page.getByRole("link", { name: "Sauce Labs Backpack" }),
+            page.getByText("Sauce Labs Backpack", { exact: true }),
           ).toBeVisible();
         });
       });
@@ -393,9 +389,9 @@ test.describe(
 
           await test.step("Paso 3: Completar los datos del comprador", async () => {
             // Completa los campos obligatorios y avanza al resumen.
-            await page.getByTestId("first-name").fill("Ada");
-            await page.getByTestId("last-name").fill("Lovelace");
-            await page.getByTestId("postal-code").fill("12345");
+            await page.locator('[data-test="firstName"]').fill("Ada");
+            await page.locator('[data-test="lastName"]').fill("Lovelace");
+            await page.locator('[data-test="postalCode"]').fill("12345");
             await page.getByRole("button", { name: "Continue" }).click();
             await expect(page).toHaveURL(/checkout-step-two.html/);
           });
@@ -447,9 +443,9 @@ test.describe(
 
           await test.step("Paso 3: Completar los datos del comprador", async () => {
             // Llena todos los campos obligatorios para poder avanzar.
-            await page.getByTestId("first-name").fill("Ada");
-            await page.getByTestId("last-name").fill("Lovelace");
-            await page.getByTestId("postal-code").fill("12345");
+            await page.locator('[data-test="firstName"]').fill("Ada");
+            await page.locator('[data-test="lastName"]').fill("Lovelace");
+            await page.locator('[data-test="postalCode"]').fill("12345");
             await page.getByRole("button", { name: "Continue" }).click();
             await expect(page).toHaveURL(/checkout-step-two.html/);
           });
@@ -495,9 +491,9 @@ test.describe(
 
             await test.step("Paso 2: Dejar vacío el nombre y enviar el formulario", async () => {
               // Completa apellido y código postal, pero no ingresa el nombre.
-              await page.getByTestId("first-name").fill("");
-              await page.getByTestId("last-name").fill("Lovelace");
-              await page.getByTestId("postal-code").fill("12345");
+              await page.locator('[data-test="firstName"]').fill("");
+              await page.locator('[data-test="lastName"]').fill("Lovelace");
+              await page.locator('[data-test="postalCode"]').fill("12345");
               await page.getByRole("button", { name: "Continue" }).click();
             });
 
@@ -520,9 +516,9 @@ test.describe(
 
             await test.step("Paso 2: Dejar vacío el apellido y enviar el formulario", async () => {
               // Completa nombre y código postal, pero no ingresa el apellido.
-              await page.getByTestId("first-name").fill("Ada");
-              await page.getByTestId("last-name").fill("");
-              await page.getByTestId("postal-code").fill("12345");
+              await page.locator('[data-test="firstName"]').fill("Ada");
+              await page.locator('[data-test="lastName"]').fill("");
+              await page.locator('[data-test="postalCode"]').fill("12345");
               await page.getByRole("button", { name: "Continue" }).click();
             });
 
@@ -545,9 +541,9 @@ test.describe(
 
             await test.step("Paso 2: Dejar vacío el código postal y enviar el formulario", async () => {
               // Completa nombre y apellido, pero no ingresa el código postal.
-              await page.getByTestId("first-name").fill("Ada");
-              await page.getByTestId("last-name").fill("Lovelace");
-              await page.getByTestId("postal-code").fill("");
+              await page.locator('[data-test="firstName"]').fill("Ada");
+              await page.locator('[data-test="lastName"]').fill("Lovelace");
+              await page.locator('[data-test="postalCode"]').fill("");
               await page.getByRole("button", { name: "Continue" }).click();
             });
 
@@ -593,7 +589,8 @@ const missingCheckoutFields = [
 for (const scenario of missingCheckoutFields) {
   // Playwright registra un test independiente usando los datos del escenario actual.
   test(`Validar checkout sin completar ${scenario.field}`, async ({ page }) => {
-    await test.step("Paso 1: Abrir el formulario de checkout", async () => {
+    await test.step("Paso 1: Iniciar sesión y abrir el checkout", async () => {
+      await loginTo(page);
       // Prepara un producto y navega hasta el formulario de datos.
       await addProductToCart(page, "Sauce Labs Backpack");
       await openCart(page);

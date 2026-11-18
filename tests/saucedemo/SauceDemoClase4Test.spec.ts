@@ -9,7 +9,7 @@ import { SauceCheckoutOverviewPage } from "../../pages/saucedemo/SauceCheckoutOv
 import { SauceLoginPage } from "../../pages/saucedemo/SauceLoginPage";
 import { SauceInventoryPage } from "../../pages/saucedemo/SauceInventoryPage";
 import { SauceProductDetailPage } from "../../pages/saucedemo/SauceProductDetailPage";
-import { SauceCheckoutInformationPage } from "../../pages/saucedemo/SauceCheckoutInformationPAge";
+import { SauceCheckoutInformationPage } from "../../pages/saucedemo/SauceCheckoutInformationPage";
 
 // Estas constantes centralizan las credenciales para reutilizarlas.
 const STANDARD_USER = "standard_user";
@@ -262,7 +262,19 @@ test.describe(
           ).toBeTruthy();
         });
 
-        await test.step("Paso 3: Regresar al inventario", async () => {
+        await test.step("Paso 3: Agregar y quitar el producto", async () => {
+          await sauceProductDetailPage.toggleAddToCart();
+          await expect(
+            page.getByRole("button", { name: "Remove", exact: true }),
+          ).toBeVisible();
+
+          await sauceProductDetailPage.toggleAddToCart();
+          await expect(
+            page.getByRole("button", { name: "Add to cart", exact: true }),
+          ).toBeVisible();
+        });
+
+        await test.step("Paso 4: Regresar al inventario", async () => {
           await sauceProductDetailPage.goBackToProducts();
           await expect(page).toHaveURL(/inventory.html/);
         });
@@ -440,7 +452,10 @@ test.describe(
           });
 
           await test.step("Paso 6: Generar y validar el PDF descargado", async () => {
+            const downloadPromise = page.waitForEvent("download");
             await new SauceCheckoutCompletePage(page).generatePDF();
+            const download = await downloadPromise;
+            expect(download.suggestedFilename()).toMatch(/\.pdf$/i);
           });
         },
       );

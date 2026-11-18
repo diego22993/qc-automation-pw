@@ -8,14 +8,23 @@ export class SauceProductDetailPage {
   private readonly productDescription: Locator;
   private readonly productPrice: Locator;
   private readonly btnAddToCart: Locator;
+  private readonly btnRemove: Locator;
   private readonly btnBackToProducts: Locator;
 
   constructor(page: Page) {
     this.page = page;
+    const productDetails = page.locator(".inventory_details");
     this.btnAddToCart = page.locator('[data-test="add-to-cart"]');
-    this.productName = page.locator('[data-test="inventory-item-name"]');
-    this.productDescription = page.locator('[data-test="inventory-item-desc"]');
-    this.productPrice = page.locator('[data-test="inventory-item-price"]');
+    this.productName = productDetails.locator(
+      '[data-test="inventory-item-name"]',
+    );
+    this.productDescription = productDetails.locator(
+      '[data-test="inventory-item-desc"]',
+    );
+    this.productPrice = productDetails.locator(
+      '[data-test="inventory-item-price"]',
+    );
+    this.btnRemove = page.getByRole("button", { name: "Remove", exact: true });
     this.shoppingCartLink = page.locator('[data-test="shopping-cart-link"]');
     this.productImage = page.locator(
       '[data-test="item-sauce-labs-backpack-img"]',
@@ -24,12 +33,11 @@ export class SauceProductDetailPage {
   }
 
   async addToCart() {
-    await this.btnAddToCart.isVisible();
     await this.btnAddToCart.click();
   }
 
   async isRemoveButtonVisible() {
-    return await this.btnAddToCart.isVisible();
+    return await this.btnRemove.isVisible();
   }
   async isAddToCartButtonVisible() {
     return await this.btnAddToCart.isVisible();
@@ -51,7 +59,7 @@ export class SauceProductDetailPage {
     if (await this.isAddToCartButtonVisible()) {
       await this.addToCart();
     } else if (await this.isRemoveButtonVisible()) {
-      await this.btnAddToCart.click();
+      await this.btnRemove.click();
     }
   }
 
