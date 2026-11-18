@@ -1,11 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
-import { CartPage } from "../../pages/saucedemo/CartPage";
-import { CheckoutCompletePage } from "../../pages/saucedemo/CheckoutCompletePage";
-import { CheckoutInformationPage } from "../../pages/saucedemo/CheckoutInformationPage";
-import { CheckoutOverviewPage } from "../../pages/saucedemo/CheckoutOverviewPage";
-import { InventoryPage } from "../../pages/saucedemo/InventoryPage";
-import { LoginPage } from "../../pages/saucedemo/LoginPage";
-import { loadSauceDemoUsers } from "../../utils/saucedemo/userDataProvider";
+import { CartPage } from "../../../pages/saucedemo/CartPage";
+import { CheckoutCompletePage } from "../../../pages/saucedemo/CheckoutCompletePage";
+import { CheckoutInformationPage } from "../../../pages/saucedemo/CheckoutInformationPage";
+import { CheckoutOverviewPage } from "../../../pages/saucedemo/CheckoutOverviewPage";
+import { InventoryPage } from "../../../pages/saucedemo/InventoryPage";
+import { LoginPage } from "../../../pages/saucedemo/LoginPage";
+import { loadSauceDemoUsers } from "../../../utils/saucedemo/userDataProvider";
 
 async function loginToInventory(page: Page): Promise<InventoryPage> {
   return test.step("Iniciar sesión y abrir el inventario", async () => {
