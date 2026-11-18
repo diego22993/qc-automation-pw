@@ -1,10 +1,24 @@
+import { config as loadDotEnv } from 'dotenv';
 import { defineConfig, devices } from '@playwright/test';
+import { resolve } from 'node:path';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
+const testEnvironment = (process.env.TEST_ENV ?? 'qa').toLowerCase();
+
+if (testEnvironment !== 'dev' && testEnvironment !== 'qa') {
+  throw new Error('TEST_ENV debe ser "dev" o "qa".');
+}
+
+loadDotEnv({
+  path: resolve(process.cwd(), `.env.${testEnvironment}`),
+});
+
+const baseURL = process.env.BASE_URL;
+
+if (!baseURL) {
+  throw new Error(
+    `Falta BASE_URL en el archivo .env.${testEnvironment}.`,
+  );
+}
 
 export default defineConfig({
   testDir: './tests',
@@ -29,8 +43,7 @@ export default defineConfig({
   
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    // URL base configurada para tu entorno de Booking.com
-    baseURL: 'https://www.booking.com',
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

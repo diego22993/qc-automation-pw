@@ -1,0 +1,4 @@
+scenario,username,password,expectedOutcome,expectedError
+login válido,standard_user,secret_sauce,success,
+usuario bloqueado,locked_out_user,secret_sauce,error,"Sorry, this user has been locked out"
+contraseña incorrecta,standard_user,wrong_password,error,Epic sadface: Username and password do not match any user in this service

@@ -1,0 +1,102 @@
+classDiagram
+    direction TB
+
+    class SauceDemoClase4Test {
+        +compraCompleta()
+    }
+
+    class PlaywrightPage {
+        <<fixture compartido>>
+    }
+
+    class LoginPage {
+        -page: Page
+        -usernameInput: Locator
+        -passwordInput: Locator
+        -loginButton: Locator
+        -errorMessage: Locator
+        +constructor(page: Page)
+        +login(usuario, contrasena)
+    }
+
+    class InventoryPage {
+        -page: Page
+        -productCards: Locator
+        -sortSelect: Locator
+        -cartLink: Locator
+        -cartBadge: Locator
+        +constructor(page: Page)
+        +agregarProducto(id)
+        +abrirCarrito()
+    }
+
+    class ProductDetailsPage {
+        <<nueva>>
+        -page: Page
+        -productName: Locator
+        -addToCartButton: Locator
+        -backToProductsButton: Locator
+        +constructor(page: Page)
+        +agregarAlCarrito()
+        +volverAlInventario()
+    }
+
+    class CartPage {
+        -page: Page
+        -cartItems: Locator
+        -removeButtons: Locator
+        -checkoutButton: Locator
+        -continueShoppingButton: Locator
+        +constructor(page: Page)
+        +iniciarCheckout()
+    }
+
+    class CheckoutInformationPage {
+        -page: Page
+        -firstNameInput: Locator
+        -lastNameInput: Locator
+        -postalCodeInput: Locator
+        -continueButton: Locator
+        -errorMessage: Locator
+        +constructor(page: Page)
+        +completarDatosCliente()
+        +continuar()
+    }
+
+    class CheckoutOverviewPage {
+        -page: Page
+        -cartItems: Locator
+        -subtotalLabel: Locator
+        -taxLabel: Locator
+        -totalLabel: Locator
+        -finishButton: Locator
+        +constructor(page: Page)
+        +finalizarCompra()
+    }
+
+    class CheckoutCompletePage {
+        -page: Page
+        -confirmationHeading: Locator
+        -backHomeButton: Locator
+        -generatePdfButton: Locator
+        +constructor(page: Page)
+        +validarConfirmacion()
+    }
+
+    SauceDemoClase4Test ..> LoginPage : crea y orquesta
+    SauceDemoClase4Test ..> InventoryPage : crea y orquesta
+    SauceDemoClase4Test ..> ProductDetailsPage : crea y orquesta
+    SauceDemoClase4Test ..> CartPage : crea y orquesta
+    SauceDemoClase4Test ..> CheckoutInformationPage : crea y orquesta
+    SauceDemoClase4Test ..> CheckoutOverviewPage : crea y orquesta
+    SauceDemoClase4Test ..> CheckoutCompletePage : crea y orquesta
+
+    LoginPage --> Page : recibe en constructor
+    InventoryPage --> Page : recibe en constructor
+    ProductDetailsPage --> Page : recibe en constructor
+    CartPage --> Page : recibe en constructor
+    CheckoutInformationPage --> Page : recibe en constructor
+    CheckoutOverviewPage --> Page : recibe en constructor
+    CheckoutCompletePage --> Page : recibe en constructor
+
+    note for Page "Referencia didactica: cada Page Object recibe la misma instancia Page del test. Locator representa un elemento o grupo de elementos de Playwright. Los atributos y constructores son una propuesta para implementar en Clase 4, basada en los tests de Clase 3."

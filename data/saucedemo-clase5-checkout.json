@@ -1,0 +1,29 @@
+[
+  {
+    "scenario": "nombre requerido",
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "firstName": "",
+    "lastName": "Lovelace",
+    "postalCode": "12345",
+    "expectedError": "Error: First Name is required"
+  },
+  {
+    "scenario": "apellido requerido",
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "firstName": "Ada",
+    "lastName": "",
+    "postalCode": "12345",
+    "expectedError": "Error: Last Name is required"
+  },
+  {
+    "scenario": "codigo postal requerido",
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "firstName": "Ada",
+    "lastName": "Lovelace",
+    "postalCode": "",
+    "expectedError": "Error: Postal Code is required"
+  }
+]

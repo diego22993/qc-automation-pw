@@ -1,0 +1,4 @@
+scenario,username,password,firstName,lastName,postalCode,expectedError
+nombre requerido,standard_user,secret_sauce,,Lovelace,12345,Error: First Name is required
+apellido requerido,standard_user,secret_sauce,Ada,,12345,Error: Last Name is required
+código postal requerido,standard_user,secret_sauce,Ada,Lovelace,,Error: Postal Code is required

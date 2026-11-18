@@ -1,0 +1,41 @@
+sequenceDiagram
+    autonumber
+    actor Test as Test de SauceDemo
+    participant Helper as loginToInventory(page)
+    participant Step as Playwright test.step
+    participant Login as LoginPage
+    participant Page as Playwright Page
+    participant App as SauceDemo
+    participant Inventory as InventoryPage
+
+    Test->>Helper: loginToInventory(page)
+    activate Helper
+    Helper->>Step: test.step("Iniciar sesion y abrir el inventario")
+    activate Step
+    Step->>Login: new LoginPage(page)
+
+    Step->>Login: goto()
+    Login->>Page: page.goto("https://www.saucedemo.com/")
+    Page->>App: GET /
+    App-->>Page: Pagina de login
+    Login->>Page: expect URL de inicio
+    Page-->>Login: Asercion aprobada
+
+    Step->>Login: login("standard_user", "secret_sauce")
+    Login->>Page: fill username y password
+    Login->>Page: click login
+    Page->>App: Enviar credenciales
+    App-->>Page: Pagina inventory.html
+
+    Step->>Login: expectInventoryPage()
+    Login->>Page: expect URL inventory.html
+    Page-->>Login: Asercion aprobada
+    Login->>Page: expect title "Products"
+    Page-->>Login: Asercion aprobada
+
+    Step->>Inventory: new InventoryPage(page)
+    Inventory-->>Step: Instancia de InventoryPage
+    Step-->>Helper: Resultado del callback
+    deactivate Step
+    Helper-->>Test: Promise~InventoryPage~ resuelta
+    deactivate Helper

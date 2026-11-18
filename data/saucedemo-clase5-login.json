@@ -1,0 +1,23 @@
+[
+  {
+    "scenario": "login valido",
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "expectedOutcome": "success",
+    "expectedError": ""
+  },
+  {
+    "scenario": "usuario bloqueado",
+    "username": "locked_out_user",
+    "password": "secret_sauce",
+    "expectedOutcome": "error",
+    "expectedError": "Sorry, this user has been locked out"
+  },
+  {
+    "scenario": "contrasena incorrecta",
+    "username": "standard_user",
+    "password": "wrong_password",
+    "expectedOutcome": "error",
+    "expectedError": "Epic sadface: Username and password do not match any user in this service"
+  }
+]

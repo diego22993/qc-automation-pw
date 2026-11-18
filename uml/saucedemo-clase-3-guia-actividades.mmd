@@ -1,0 +1,71 @@
+flowchart TD
+    start([Inicio de la actividad])
+    goal["Objetivo: implementar y entender flujos E2E directos<br/>Usar Playwright, locators, test.step y expect<br/>No implementar POM en esta primera grabacion"]
+    setup["Preparacion<br/>Abrir el proyecto y el archivo saucedemo-clase-3.spec.ts<br/>Ejecutar Playwright con --list"]
+    rootSuite["Suite principal<br/>SauceDemo - Flujos E2E de compra<br/>Tags: @saucedemo y @regression"]
+
+    start --> goal --> setup --> rootSuite
+
+    subgraph authSuite["Suite: Autenticacion @auth"]
+        authLogin["Login exitoso<br/>Abrir login, completar usuario y contrasena<br/>Esperado: inventory.html y Products visible"]
+        authInvalid["Credenciales invalidas<br/>Enviar contrasena incorrecta<br/>Esperado: mensaje de error y login visible"]
+        authLocked["Usuario bloqueado<br/>Ingresar locked_out_user<br/>Esperado: mensaje de cuenta bloqueada"]
+        authLogout["Cerrar sesion<br/>Abrir menu y pulsar Logout<br/>Esperado: volver al login y bloquear acceso directo al inventario"]
+    end
+
+    subgraph inventorySuite["Suite: Inventario @inventory"]
+        inventorySetup["beforeEach<br/>Iniciar sesion antes de cada test"]
+        sortNamesAZ["Ordenar nombres A-Z<br/>Seleccionar az y validar combo<br/>Validar los seis nombres en orden"]
+        sortNamesZA["Ordenar nombres Z-A<br/>Seleccionar za y validar combo<br/>Validar los seis nombres en orden inverso"]
+        sortPriceLow["Ordenar precios menor a mayor<br/>Seleccionar lohi y validar combo<br/>Validar precios: 7.99, 9.99, 15.99, 15.99, 29.99, 49.99"]
+        sortPriceHigh["Ordenar precios mayor a menor<br/>Seleccionar hilo y validar combo<br/>Validar precios en orden inverso"]
+        productDetail["Detalle de producto<br/>Abrir Sauce Labs Backpack<br/>Validar detalle y regresar al inventario"]
+    end
+
+    subgraph cartSuite["Suite: Carrito @cart"]
+        cartSetup["beforeEach<br/>Iniciar sesion antes de cada test"]
+        addRemove["Agregar y quitar producto<br/>Agregar Backpack, validar badge 1<br/>Abrir carrito, quitarlo y validar carrito vacio"]
+        persistCart["Conservar productos al navegar<br/>Agregar Backpack y Bike Light, validar badge 2<br/>Ir al inventario y confirmar que siguen en el carrito"]
+    end
+
+    subgraph checkoutSuite["Suite: Checkout @checkout"]
+        checkoutSetup["beforeEach<br/>Iniciar sesion antes de cada test"]
+        checkoutHappy["Compra exitosa<br/>Agregar dos productos y revisar el carrito<br/>Completar datos y validar el resumen<br/>Subtotal 39.98, impuesto 3.20, total 43.18<br/>Finish y confirmar Thank you for your order"]
+        pdfFlow["Flujo PDF actual<br/>Completar checkout de un producto<br/>Llegar a checkout-complete y pulsar Generate PDF order<br/>En esta actividad no se valida el archivo descargado"]
+        missingExplicit["Campos requeridos: tests explicitos<br/>Un test sin First Name, otro sin Last Name<br/>Otro sin Zip/Postal Code; validar mensaje por campo"]
+        missingData["Campos requeridos: datos y for-of<br/>Usar un objeto por campo faltante<br/>Playwright registra un test por escenario"]
+    end
+
+    rootSuite --> authLogin
+    rootSuite --> inventorySetup
+    rootSuite --> cartSetup
+    rootSuite --> checkoutSetup
+
+    inventorySetup --> sortNamesAZ
+    inventorySetup --> sortNamesZA
+    inventorySetup --> sortPriceLow
+    inventorySetup --> sortPriceHigh
+    inventorySetup --> productDetail
+
+    cartSetup --> addRemove
+    cartSetup --> persistCart
+
+    checkoutSetup --> checkoutHappy
+    checkoutSetup --> pdfFlow
+    checkoutSetup --> missingExplicit
+    checkoutSetup --> missingData
+
+    warning["Antes de ejecutar: en el archivo actual, missingCheckoutFields y su for-of estan fuera de la suite Checkout.<br/>Moverlos dentro de la suite para heredar el login del beforeEach; de lo contrario, empiezan sin sesion."]
+    missingData -. revisar preparacion .-> warning
+
+    runOne["Ejecutar primero un test con --grep<br/>Si pasa, ejecutar su suite y despues el archivo completo"]
+    rootSuite --> runOne
+
+    classDef setup fill:#fff4d6,stroke:#b38b22,color:#332600
+    classDef flow fill:#e8f0fe,stroke:#4776c5,color:#172b4d
+    classDef check fill:#f4f8f3,stroke:#4b7f52,color:#142817
+    classDef warning fill:#fde8e7,stroke:#c43d32,color:#4a1713
+    class start,goal,rootSuite,runOne setup
+    class authLogin,authInvalid,authLocked,authLogout,sortNamesAZ,sortNamesZA,sortPriceLow,sortPriceHigh,productDetail,addRemove,persistCart,checkoutHappy,pdfFlow,missingExplicit,missingData flow
+    class inventorySetup,cartSetup,checkoutSetup check
+    class warning warning

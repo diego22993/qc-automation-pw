@@ -1,0 +1,27 @@
+flowchart LR
+    test["Test<br/>saucedemo-clase-4.test.ts<br/>Orquesta el recorrido y verifica el resultado"]
+    pages["Page Objects<br/>LoginPage · InventoryPage · ProductDetailsPage (nueva)<br/>CartPage · CheckoutInformationPage<br/>CheckoutOverviewPage · CheckoutCompletePage"]
+    runtime["Playwright Page<br/>Navegador"]
+    app["SauceDemo"]
+
+    test -->|usa| pages
+    pages -->|interactuan mediante| runtime
+    runtime --> app
+
+    journey["Recorrido de ejemplo<br/>Login → Inventario → Detalle del producto<br/>→ Carrito → Checkout → Confirmacion"]
+    test -. "orquesta" .-> journey
+
+    urls["Pantallas del ejercicio<br/>/ · /inventory.html · /inventory-item.html?id=4<br/>/cart.html · /checkout-step-one.html<br/>/checkout-step-two.html · /checkout-complete.html"]
+    pages -. "una clase por pantalla" .-> urls
+
+    note["Idea clave<br/>El test describe el flujo.<br/>Los Page Objects ocultan los detalles de cada pantalla."]
+    test -.-> note
+
+    classDef test fill:#fff4d6,stroke:#b38b22,color:#332600
+    classDef pageobject fill:#e8f0fe,stroke:#4776c5,color:#172b4d
+    classDef platform fill:#f4f8f3,stroke:#4b7f52,color:#142817
+    classDef note fill:#f5efff,stroke:#7a58a5,color:#302047
+    class test,journey test
+    class pages,urls pageobject
+    class runtime,app platform
+    class note note
