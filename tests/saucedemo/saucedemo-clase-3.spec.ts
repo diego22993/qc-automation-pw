@@ -5,7 +5,8 @@
 import { expect, test, type Page } from "@playwright/test";
 import { SauceLoginPage } from "../../pages/saucedemo/SauceLoginPage";
 
-// Estas constantes centralizan las credenciales para reutilizarlas.
+// Estas constantes centralizan la URL y las credenciales para reutilizarlas.
+const BASE_URL = "https://www.saucedemo.com/";
 const STANDARD_USER = "standard_user";
 const PASSWORD = "secret_sauce";
 
@@ -22,7 +23,7 @@ async function loginTo(
   password = PASSWORD,
 ): Promise<void> {
   // Abre la tienda antes de interactuar con los campos de acceso.
-  await page.goto("/");
+  await page.goto(BASE_URL);
   // Busca el campo por su texto de ayuda y escribe el usuario.
   await page.getByTestId("user-name").fill(username);
   // Escribe la contraseña en el campo correspondiente.
@@ -64,7 +65,7 @@ async function openCart(page: Page): Promise<void> {
 // Suite principal: sus etiquetas se heredan en los tests internos.
 test.describe(
   "SauceDemo - Flujos E2E de compra",
-  { tag: ["@saucedemo", "@regression"] },
+  { tag: ["@sauce", "@regression"] },
   () => {
     // Pruebas que verifican acceso, rechazo de acceso y cierre de sesión.
     test.describe("Autenticación", { tag: "@auth" }, () => {
@@ -96,7 +97,7 @@ test.describe(
       test("Rechazar credenciales inválidas", async ({ page }) => {
         await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
           // Empieza en una página limpia de login.
-          await page.goto("/");
+          await page.goto(BASE_URL);
         });
 
         await test.step("Paso 2: Enviar una contraseña incorrecta", async () => {
@@ -119,7 +120,7 @@ test.describe(
       test("Impedir el acceso al usuario bloqueado", async ({ page }) => {
         await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
           // Abre el formulario antes de probar el usuario bloqueado.
-          await page.goto("/");
+          await page.goto(BASE_URL);
         });
 
         await test.step("Paso 2: Intentar ingresar con locked_out_user", async () => {
@@ -160,7 +161,7 @@ test.describe(
 
         await test.step("Paso 4: Verificar que el inventario requiere autenticación", async () => {
           // Intenta abrir directamente una ruta protegida después de salir.
-          await page.goto("/inventory.html");
+          await page.goto(`${BASE_URL}inventory.html`);
           // Confirma que el sitio redirige al formulario de acceso.
           await expect(page.getByTestId("user-name")).toBeVisible();
         });

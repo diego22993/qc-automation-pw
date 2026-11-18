@@ -2,101 +2,157 @@ classDiagram
     direction TB
 
     class SauceDemoClase4Test {
-        +compraCompleta()
+        <<test module>>
+        -STANDARD_USER: string
+        -PASSWORD: string
+        +suiteAutenticacion()
+        +suiteInventario()
+        +suiteCarrito()
+        +suiteCheckout()
+        -loginTo(page, username, password): SauceInventoryPage
+        -openCheckoutInformation(page): SauceCheckoutInformationPage
     }
 
-    class PlaywrightPage {
-        <<fixture compartido>>
+    class Page {
+        <<Playwright fixture>>
+        +goto(url)
+        +locator(selector)
     }
 
-    class LoginPage {
+    class SauceLoginPage {
+        <<Page Object>>
         -page: Page
-        -usernameInput: Locator
-        -passwordInput: Locator
-        -loginButton: Locator
-        -errorMessage: Locator
-        +constructor(page: Page)
-        +login(usuario, contrasena)
+        -inputUsername: Locator
+        -inputPassword: Locator
+        -btnLogin: Locator
+        -errorMsg: Locator
+        +constructor(page)
+        +goto()
+        +login(username, password)
+        +getErrorMessage()
+        +getInventoryPageVisible()
+        +logout()
+        +isUsernameVisible()
+        +isPasswordVisible()
+        +isLoginButtonVisible()
+        +goToInventoryPage(): SauceInventoryPage
     }
 
-    class InventoryPage {
+    class SauceInventoryPage {
+        <<Page Object>>
         -page: Page
-        -productCards: Locator
-        -sortSelect: Locator
-        -cartLink: Locator
-        -cartBadge: Locator
-        +constructor(page: Page)
-        +agregarProducto(id)
-        +abrirCarrito()
+        -inventoryTitle: Locator
+        -productNames: Locator
+        -productPrices: Locator
+        +constructor(page)
+        +orderByName(option, expectedResult)
+        +getProductNames()
+        +getProductPrices()
+        +addProductToCart(productName)
+        +getCartBadgeText()
+        +isCartBadgeVisible()
+        +openCart()
+        +orderByPrice(option, expectedResult)
+        +openProductDetail(productName)
+        +openInventoryDirectly()
     }
 
-    class ProductDetailsPage {
-        <<nueva>>
+    class SauceProductDetailPage {
+        <<Page Object>>
         -page: Page
         -productName: Locator
-        -addToCartButton: Locator
-        -backToProductsButton: Locator
-        +constructor(page: Page)
-        +agregarAlCarrito()
-        +volverAlInventario()
+        -productDescription: Locator
+        -productPrice: Locator
+        -btnAddToCart: Locator
+        -btnBackToProducts: Locator
+        +constructor(page)
+        +validateUrl()
+        +isProductNameVisible()
+        +isProductDescriptionVisible()
+        +isProductPriceVisible()
+        +isAddToCartButtonVisible()
+        +goBackToProducts()
     }
 
-    class CartPage {
+    class SauceCartPage {
+        <<Page Object>>
         -page: Page
+        -btnCheckout: Locator
+        -btnRemove: Locator
+        -btnContinueShopping: Locator
         -cartItems: Locator
-        -removeButtons: Locator
-        -checkoutButton: Locator
-        -continueShoppingButton: Locator
-        +constructor(page: Page)
-        +iniciarCheckout()
+        -cartItemNames: Locator
+        -cartBadge: Locator
+        +constructor(page)
+        +getItemCount()
+        +getItemNames()
+        +getCartBadgeText()
+        +isCartBadgeVisible()
+        +checkout()
+        +removeProduct(productName)
+        +continueShopping()
     }
 
-    class CheckoutInformationPage {
+    class SauceCheckoutInformationPage {
+        <<Page Object>>
         -page: Page
-        -firstNameInput: Locator
-        -lastNameInput: Locator
-        -postalCodeInput: Locator
-        -continueButton: Locator
+        -inputFirstName: Locator
+        -inputLastname: Locator
+        -inputPostalCode: Locator
+        -btnContinue: Locator
         -errorMessage: Locator
-        +constructor(page: Page)
-        +completarDatosCliente()
-        +continuar()
+        +constructor(page)
+        +fillData(firstName, lastName, postalCode)
+        +getErrorMessage()
     }
 
-    class CheckoutOverviewPage {
+    class SauceCheckoutOverviewPage {
+        <<Page Object>>
         -page: Page
         -cartItems: Locator
+        -cartItemNames: Locator
         -subtotalLabel: Locator
         -taxLabel: Locator
         -totalLabel: Locator
-        -finishButton: Locator
-        +constructor(page: Page)
-        +finalizarCompra()
+        -btnFinish: Locator
+        +constructor(page)
+        +getItemCount()
+        +getItemNames()
+        +getSubtotal()
+        +getTax()
+        +getTotal()
+        +finish()
     }
 
-    class CheckoutCompletePage {
+    class SauceCheckoutCompletePage {
+        <<Page Object>>
         -page: Page
-        -confirmationHeading: Locator
-        -backHomeButton: Locator
-        -generatePdfButton: Locator
-        +constructor(page: Page)
-        +validarConfirmacion()
+        -completeHeader: Locator
+        -completeText: Locator
+        -btnBackToHome: Locator
+        -btnGeneratePDF: Locator
+        +constructor(page)
+        +getCompleteHeaderText()
+        +isBackToHomeButtonVisible()
+        +backToHome()
+        +generatePDF()
     }
 
-    SauceDemoClase4Test ..> LoginPage : crea y orquesta
-    SauceDemoClase4Test ..> InventoryPage : crea y orquesta
-    SauceDemoClase4Test ..> ProductDetailsPage : crea y orquesta
-    SauceDemoClase4Test ..> CartPage : crea y orquesta
-    SauceDemoClase4Test ..> CheckoutInformationPage : crea y orquesta
-    SauceDemoClase4Test ..> CheckoutOverviewPage : crea y orquesta
-    SauceDemoClase4Test ..> CheckoutCompletePage : crea y orquesta
+    SauceDemoClase4Test ..> Page : recibe fixture en cada test
+    SauceDemoClase4Test ..> SauceLoginPage : crea y orquesta
+    SauceDemoClase4Test ..> SauceInventoryPage : crea y orquesta
+    SauceDemoClase4Test ..> SauceProductDetailPage : crea y orquesta
+    SauceDemoClase4Test ..> SauceCartPage : crea y orquesta
+    SauceDemoClase4Test ..> SauceCheckoutInformationPage : crea y orquesta
+    SauceDemoClase4Test ..> SauceCheckoutOverviewPage : crea y orquesta
+    SauceDemoClase4Test ..> SauceCheckoutCompletePage : crea y orquesta
 
-    LoginPage --> Page : recibe en constructor
-    InventoryPage --> Page : recibe en constructor
-    ProductDetailsPage --> Page : recibe en constructor
-    CartPage --> Page : recibe en constructor
-    CheckoutInformationPage --> Page : recibe en constructor
-    CheckoutOverviewPage --> Page : recibe en constructor
-    CheckoutCompletePage --> Page : recibe en constructor
+    SauceLoginPage --> Page : recibe en constructor
+    SauceInventoryPage --> Page : recibe en constructor
+    SauceProductDetailPage --> Page : recibe en constructor
+    SauceCartPage --> Page : recibe en constructor
+    SauceCheckoutInformationPage --> Page : recibe en constructor
+    SauceCheckoutOverviewPage --> Page : recibe en constructor
+    SauceCheckoutCompletePage --> Page : recibe en constructor
 
-    note for Page "Referencia didactica: cada Page Object recibe la misma instancia Page del test. Locator representa un elemento o grupo de elementos de Playwright. Los atributos y constructores son una propuesta para implementar en Clase 4, basada en los tests de Clase 3."
+    note for SauceDemoClase4Test "loginTo se usa en los tests activos. openCheckoutInformation esta definido, pero actualmente solo lo referencian escenarios comentados. El spec coordina los flujos y aserciones; los Page Objects encapsulan locators y acciones de cada pantalla."
