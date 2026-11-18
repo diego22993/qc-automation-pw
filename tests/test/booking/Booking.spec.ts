@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { BookingSearchPage } from '../../../page/BookingSearchPgage';
+import { BookingSearchPage } from '../../../pages/booking/BookingSearchPage';
 
 test(
   "Actividad 1: Búsqueda dinámica con manejo de modales en Booking",

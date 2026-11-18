@@ -37,11 +37,8 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-<<<<<<< HEAD
     },/*
-=======
     }/*,
->>>>>>> origin/main
 
     {
       name: 'firefox',
@@ -51,13 +48,9 @@ export default defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-<<<<<<< HEAD
+
     },*/
 
-=======
-    },
-*/
->>>>>>> origin/main
     /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',
