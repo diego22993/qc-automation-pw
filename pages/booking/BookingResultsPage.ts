@@ -2,7 +2,7 @@ import { expect, type Page } from "@playwright/test";
 import {
   dismissBookingModalIfPresent,
   registerBookingModal,
-} from "../bookingModal";
+} from "./bookingModal";
 import { BookingBasePage } from "./BookingBasePage";
 
 type OpenHotelResult = {

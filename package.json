@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui",
     "test:smoke": "npx playwright test --ui --grep @smoke",

@@ -9,7 +9,7 @@ import { SauceCheckoutOverviewPage } from "../../pages/saucedemo/SauceCheckoutOv
 import { SauceLoginPage } from "../../pages/saucedemo/SauceLoginPage";
 import { SauceInventoryPage } from "../../pages/saucedemo/SauceInventoryPage";
 import { SauceProductDetailPage } from "../../pages/saucedemo/SauceProductDetailPage";
-import { SauceCheckoutInformationPage } from "../../pages/saucedemo/SauceCheckoutInformationPAge";
+import { SauceCheckoutInformationPage } from "../../pages/saucedemo/SauceCheckoutInformationPage";
 
 // Estas constantes centralizan las credenciales para reutilizarlas.
 const STANDARD_USER = "standard_user";
