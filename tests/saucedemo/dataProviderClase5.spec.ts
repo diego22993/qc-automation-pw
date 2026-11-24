@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { SauceLoginPage } from "../../pages/saucedemo/SauceLoginPage";
+import { test, expect } from "../../fixtures/saucedemo.fixture";
 import { userDataProvider } from "../../utils/saucedemo/userDataProvider";
 
 const users = userDataProvider();
@@ -13,19 +12,13 @@ test.describe(
 
     users.forEach((user1) => {
       test(`Validar acceso para el escenario: ${user1.scenario}`, async ({
-        page,
+        sauceLoginPage,
       }) => {
-        const sauceLoginPage = new SauceLoginPage(page);
-
-        await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
-          await sauceLoginPage.goto();
-        });
-
-        await test.step(`Paso 2: Ingresar credenciales para ${user1.scenario}`, async () => {
+        await test.step(`Ingresar credenciales para ${user1.scenario}`, async () => {
           await sauceLoginPage.login(user1.userName, user1.password);
         });
 
-        await test.step("Paso 3: Verificar el resultado esperado según el tipo de usuario", async () => {
+        await test.step("Verificar el resultado esperado según el tipo de usuario", async () => {
           if (user1.expectSuccess) {
             expect(await sauceLoginPage.getInventoryPageVisible()).toBeTruthy();
           } else {
@@ -36,6 +29,16 @@ test.describe(
         });
       });
     });
+
+    test(
+      "La fixture inicia sesión con el usuario estándar",
+      { tag: "@smoke" },
+      async ({ authenticatedInventoryPage }) => {
+        expect(await authenticatedInventoryPage.getProductNames()).not.toHaveLength(
+          0,
+        );
+      },
+    );
   },
 );
 
