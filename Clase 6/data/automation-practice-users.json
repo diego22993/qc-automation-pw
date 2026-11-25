@@ -1,0 +1,23 @@
+{
+  "validLogin": {
+    "scenario": "Inicio de sesion positivo",
+    "userName": "student",
+    "password": "Password123",
+    "expectSuccess": true,
+    "msjError": ""
+  },
+  "invalidUser": {
+    "scenario": "Nombre de usuario negativo",
+    "userName": "incorrect",
+    "password": "Password123",
+    "expectSuccess": false,
+    "msjError": "Your username is invalid!"
+  },
+  "invalidPassword": {
+    "scenario": "Contrasena negativa",
+    "userName": "student",
+    "password": "incorrect",
+    "expectSuccess": false,
+    "msjError": "Your password is invalid!"
+  }
+}
