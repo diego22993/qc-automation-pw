@@ -2,36 +2,15 @@
  * Archivo de pruebas E2E para SauceDemo utilizando Playwright.
  * Contiene flujos de autenticación y compra de productos.
  */
-import { expect, test, type Page } from "@playwright/test";
-import { SauceLoginPage } from "../../pages/saucedemo/SauceLoginPage";
+import {
+  expect,
+  SAUCE_DEMO_CREDENTIALS,
+  test,
+} from "./fixtures";
+import type { Page } from "@playwright/test";
 
 // Estas constantes centralizan la URL y las credenciales para reutilizarlas.
 const BASE_URL = "https://www.saucedemo.com/";
-const STANDARD_USER = "standard_user";
-const PASSWORD = "secret_sauce";
-
-/**
- * Objetivo: iniciar sesión en SauceDemo con las credenciales indicadas.
- * @param page Pestaña de Playwright en la que se realizará el flujo de login.
- * @param username Usuario que se escribirá; por defecto usa standard_user.
- * @param password Contraseña que se escribirá; por defecto usa secret_sauce.
- * @returns Una promesa que termina cuando se envía el formulario; no devuelve un valor.
- */
-async function loginTo(
-  page: Page,
-  username = STANDARD_USER,
-  password = PASSWORD,
-): Promise<void> {
-  // Abre la tienda antes de interactuar con los campos de acceso.
-  await page.goto(BASE_URL);
-  // Busca el campo por su texto de ayuda y escribe el usuario.
-  await page.getByTestId("user-name").fill(username);
-  // Escribe la contraseña en el campo correspondiente.
-  await page.getByTestId("password").fill(password);
-  // Hace clic en el botón y espera a que Playwright complete la acción.
-  await page.getByRole("button", { name: "Login" }).click();
-}
-
 /**
  * Objetivo: agregar al carrito el producto cuyo nombre se proporciona.
  * @param page Pestaña de Playwright donde está abierto el inventario.
@@ -72,16 +51,18 @@ test.describe(
       test(
         "Iniciar sesión con credenciales válidas",
         { tag: "@smoke" },
-        async ({ page }) => {
+        async ({ page, loginPage }) => {
           await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
             // Navega al login y confirma que el formulario está disponible.
-            const sauceLoginPage = new SauceLoginPage(page);
-            await sauceLoginPage.goto();
+            expect(await loginPage.isUsernameVisible()).toBeTruthy();
           });
 
           await test.step("Paso 2: Ingresar credenciales válidas", async () => {
             // Completa ambos campos con el usuario estándar de SauceDemo.
-            ;
+            await loginPage.login(
+              SAUCE_DEMO_CREDENTIALS.standardUser,
+              SAUCE_DEMO_CREDENTIALS.password,
+            );
           });
 
           await test.step("Paso 3: Verificar que se abrió el inventario", async () => {
@@ -94,46 +75,46 @@ test.describe(
         },
       );
 
-      test("Rechazar credenciales inválidas", async ({ page }) => {
+      test("Rechazar credenciales inválidas", async ({ loginPage }) => {
         await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
           // Empieza en una página limpia de login.
-          await page.goto(BASE_URL);
+          expect(await loginPage.isUsernameVisible()).toBeTruthy();
         });
 
         await test.step("Paso 2: Enviar una contraseña incorrecta", async () => {
           // Usa un usuario conocido, pero una contraseña que no es válida.
-          await page.getByTestId("user-name").fill(STANDARD_USER);
-          await page.getByTestId("password").fill("wrong_password");
-          // Envía el formulario para provocar la respuesta de error.
-          await page.getByRole("button", { name: "Login" }).click();
+          await loginPage.login(
+            SAUCE_DEMO_CREDENTIALS.standardUser,
+            "wrong_password",
+          );
         });
 
         await test.step("Paso 3: Verificar el mensaje de error", async () => {
           // Confirma el texto del error y que el formulario de login siga visible.
-          await expect(page.locator('[data-test="error"]')).toContainText(
+          expect(await loginPage.getErrorMessage()).toContain(
             "Username and password do not match",
           );
-          await expect(page.getByTestId("user-name")).toBeVisible();
+          expect(await loginPage.isUsernameVisible()).toBeTruthy();
         });
       });
 
-      test("Impedir el acceso al usuario bloqueado", async ({ page }) => {
+      test("Impedir el acceso al usuario bloqueado", async ({ loginPage }) => {
         await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
           // Abre el formulario antes de probar el usuario bloqueado.
-          await page.goto(BASE_URL);
+          expect(await loginPage.isUsernameVisible()).toBeTruthy();
         });
 
         await test.step("Paso 2: Intentar ingresar con locked_out_user", async () => {
           // Completa el formulario con el usuario bloqueado y la contraseña de demo.
-          await page.getByTestId("user-name").fill("locked_out_user");
-          await page.getByTestId("password").fill(PASSWORD);
-          // Envía las credenciales para que la aplicación responda.
-          await page.getByRole("button", { name: "Login" }).click();
+          await loginPage.login(
+            "locked_out_user",
+            SAUCE_DEMO_CREDENTIALS.password,
+          );
         });
 
         await test.step("Paso 3: Verificar que el acceso fue bloqueado", async () => {
           // Comprueba que SauceDemo informa que la cuenta está bloqueada.
-          await expect(page.locator('[data-test="error"]')).toContainText(
+          expect(await loginPage.getErrorMessage()).toContain(
             "Sorry, this user has been locked out",
           );
         });
@@ -141,41 +122,38 @@ test.describe(
 
       test("Cerrar sesión e impedir el acceso directo al inventario", async ({
         page,
+        loginPage,
+        inventoryPage,
       }) => {
         await test.step("Paso 1: Iniciar sesión", async () => {
-          // Reutiliza el helper y confirma que se llegó al inventario.
-          await loginTo(page);
+          expect(await inventoryPage.getProductNames()).not.toHaveLength(0);
           await expect(page).toHaveURL(/inventory.html/);
         });
 
         await test.step("Paso 2: Cerrar sesión desde el menú", async () => {
           // Abre la navegación lateral y selecciona la opción para salir.
-          await page.getByRole("button", { name: "Open Menu" }).click();
-          await page.locator('[data-test="logout-sidebar-link"]').click();
+          await loginPage.logout();
         });
 
         await test.step("Paso 3: Verificar el regreso al login", async () => {
           // La presencia del campo de usuario confirma que terminó la sesión.
-          await expect(page.getByTestId("user-name")).toBeVisible();
+          expect(await loginPage.isUsernameVisible()).toBeTruthy();
         });
 
         await test.step("Paso 4: Verificar que el inventario requiere autenticación", async () => {
           // Intenta abrir directamente una ruta protegida después de salir.
           await page.goto(`${BASE_URL}inventory.html`);
           // Confirma que el sitio redirige al formulario de acceso.
-          await expect(page.getByTestId("user-name")).toBeVisible();
+          expect(await loginPage.isUsernameVisible()).toBeTruthy();
         });
       });
     });
 
     // Suite para las opciones de ordenamiento y el detalle de producto.
     test.describe("Inventario", { tag: "@inventory" }, () => {
-      test.beforeEach(async ({ page }) => {
-        await test.step("Preparación: Iniciar sesión", async () => {
-          // Cada test empieza con su propia sesión para no depender de otro test.
-          await loginTo(page);
-          await expect(page).toHaveURL(/inventory.html/);
-        });
+      test.beforeEach(async ({ page, inventoryPage }) => {
+        await expect(page).toHaveURL(/inventory.html/);
+        expect(await inventoryPage.getProductNames()).not.toHaveLength(0);
       });
 
       test("Ordenar productos por nombre y precio", async ({ page }) => {
@@ -287,12 +265,9 @@ test.describe(
 
     // Suite para agregar, quitar y conservar artículos del carrito.
     test.describe("Carrito", { tag: "@cart" }, () => {
-      test.beforeEach(async ({ page }) => {
-        await test.step("Preparación: Iniciar sesión", async () => {
-          // Aísla cada prueba comenzando desde el inventario con la sesión iniciada.
-          await loginTo(page);
-          await expect(page).toHaveURL(/inventory.html/);
-        });
+      test.beforeEach(async ({ page, inventoryPage }) => {
+        await expect(page).toHaveURL(/inventory.html/);
+        expect(await inventoryPage.getProductNames()).not.toHaveLength(0);
       });
 
       test("Agregar y quitar productos del carrito", async ({ page }) => {
@@ -360,12 +335,9 @@ test.describe(
 
     // Suite para completar una compra y verificar errores de datos obligatorios.
     test.describe("Checkout", { tag: "@checkout" }, () => {
-      test.beforeEach(async ({ page }) => {
-        await test.step("Preparación: Iniciar sesión", async () => {
-          // Cada caso comienza en el inventario, sin depender de otros casos.
-          await loginTo(page);
-          await expect(page).toHaveURL(/inventory.html/);
-        });
+      test.beforeEach(async ({ page, inventoryPage }) => {
+        await expect(page).toHaveURL(/inventory.html/);
+        expect(await inventoryPage.getProductNames()).not.toHaveLength(0);
       });
 
       test(

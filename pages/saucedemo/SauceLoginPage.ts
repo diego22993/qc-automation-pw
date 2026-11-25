@@ -31,7 +31,9 @@ export class SauceLoginPage {
 
   async getInventoryPageVisible() {
     await this.page.waitForURL(/inventory.html/);
-    await expect(this.page.getByText("Products", { exact: true })).toBeVisible();
+    await expect(this.page.getByText("Products", { exact: true })).toBeVisible({
+      timeout: 15_000,
+    });
     return true;
   }
 

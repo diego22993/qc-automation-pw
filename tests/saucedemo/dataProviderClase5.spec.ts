@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { SauceLoginPage } from "../../pages/saucedemo/SauceLoginPage";
+import { expect, test } from "./fixtures";
 import { loadUserDataProvider } from "../../utils/saucedemo/userDataProvider";
 
 test.describe(
@@ -8,20 +7,19 @@ test.describe(
   () => {
     loadUserDataProvider().forEach((user) => {
       test(`Validar acceso para el escenario: ${user.scenario}`, async ({
-        page,
+        loginPage,
       }) => {
-        const sauceLoginPage = new SauceLoginPage(page);
         await test.step("Paso 1: Abrir la página de inicio de sesión", async () => {
-          await sauceLoginPage.goto();
+          expect(await loginPage.isUsernameVisible()).toBeTruthy();
         });
         await test.step(`Paso 2: Ingresar credenciales para ${user.scenario}`, async () => {
-          await sauceLoginPage.login(user.userName, user.password);
+          await loginPage.login(user.userName, user.password);
         });
         await test.step("Paso 3: Verificar el resultado esperado según el tipo de usuario", async () => {
           if (user.expectSuccess) {
-            expect(await sauceLoginPage.getInventoryPageVisible()).toBeTruthy();
+            expect(await loginPage.getInventoryPageVisible()).toBeTruthy();
           } else {
-            const errorMessage = await sauceLoginPage.getErrorMessage();
+            const errorMessage = await loginPage.getErrorMessage();
             expect(errorMessage).toContain(user.msjError);
           }
         });
