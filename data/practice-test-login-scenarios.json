@@ -1,0 +1,29 @@
+[
+  {
+    "scenario": "login valido",
+    "username": "student",
+    "password": "Password123",
+    "expectedOutcome": "success",
+    "expectedUrlPart": "logged-in-successfully",
+    "expectedMessage": "Congratulations student. You successfully logged in!",
+    "expectedError": ""
+  },
+  {
+    "scenario": "usuario invalido",
+    "username": "incorrectUser",
+    "password": "Password123",
+    "expectedOutcome": "error",
+    "expectedUrlPart": "",
+    "expectedMessage": "",
+    "expectedError": "Your username is invalid!"
+  },
+  {
+    "scenario": "contrasena invalida",
+    "username": "student",
+    "password": "incorrectPassword",
+    "expectedOutcome": "error",
+    "expectedUrlPart": "",
+    "expectedMessage": "",
+    "expectedError": "Your password is invalid!"
+  }
+]

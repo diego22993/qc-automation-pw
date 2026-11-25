@@ -1,0 +1,11 @@
+[
+  {
+    "scenario": "formulario de contacto con datos sintéticos",
+    "userIdentity": {
+      "firstName": "qa",
+      "surnames": ["Garcia", "Perez", "Lopez", "Gomez", "Mendez"],
+      "domain": "example.com"
+    },
+    "message": "QA E2E test message. This form is intentionally not submitted."
+  }
+]

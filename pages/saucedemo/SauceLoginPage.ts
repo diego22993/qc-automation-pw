@@ -1,4 +1,6 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
+import { SauceHeader } from "./SauceHeader";
+import { SauceInventoryPage } from "./SauceInventoryPage";
 
 export class SauceLoginPage {
   private readonly page: Page;
@@ -6,6 +8,7 @@ export class SauceLoginPage {
   private readonly inputPassword: Locator;
   private readonly btnLogin: Locator;
   private readonly errorMsg: Locator;
+  private readonly header: SauceHeader;
 
   constructor(page: Page) {
     this.page = page;
@@ -13,10 +16,11 @@ export class SauceLoginPage {
     this.inputPassword = page.locator('[data-test="password"]');
     this.btnLogin = page.locator('[data-test="login-button"]');
     this.errorMsg = page.locator('[data-test="error"]');
+    this.header = new SauceHeader(page);
   }
 
   async goto() {
-    await this.page.goto("https://www.saucedemo.com/");
+    await this.page.goto("/");
   }
 
   async login(username: string, password: string) {
@@ -26,39 +30,33 @@ export class SauceLoginPage {
   }
 
   async getErrorMessage() {
-    return await this.errorMsg.textContent();
+    return this.errorMsg.innerText();
   }
 
-  async getInventoryPageVisible() {
+  async waitForInventoryPage(): Promise<void> {
     await this.page.waitForURL(/inventory.html/);
-    await expect(this.page.getByText("Products", { exact: true })).toBeVisible();
-    return true;
+    await this.page.locator('[data-test="title"]').waitFor({ state: "visible" });
   }
 
-  // definimos el método async logout para cerrar sesión desde el menú lateral.
   async logout() {
-    await this.page.getByRole("button", { name: "Open Menu" }).click();
-    await this.page.locator('[data-test="logout-sidebar-link"]').click();
+    await this.header.logout();
     await this.inputUsername.waitFor({ state: "visible" });
   }
 
-  // método async para validar visibilidad del campo de usuario.
   async isUsernameVisible() {
-    return await this.inputUsername.isVisible();
-  }
-  // método async para validar visibilidad del campo de contraseña.
-  async isPasswordVisible() {
-    return await this.inputPassword.isVisible();
-  }
-  // método async para validar visibilidad del botón de login.
-  async isLoginButtonVisible() {
-    return await this.btnLogin.isVisible();
+    return this.inputUsername.isVisible();
   }
 
-  // método asyncrono que retorne la creación de una instancia de inventory page después del login exitoso.
+  async isPasswordVisible() {
+    return this.inputPassword.isVisible();
+  }
+
+  async isLoginButtonVisible() {
+    return this.btnLogin.isVisible();
+  }
+
   async goToInventoryPage() {
-    await this.page.waitForURL(/inventory.html/);
-    const { SauceInventoryPage } = await import("./SauceInventoryPage");
+    await this.waitForInventoryPage();
     return new SauceInventoryPage(this.page);
   }
 }

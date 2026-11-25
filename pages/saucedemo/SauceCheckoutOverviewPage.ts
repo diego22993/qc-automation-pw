@@ -4,7 +4,6 @@ export class SauceCheckoutOverviewPage {
   private readonly page: Page;
   private readonly btnFinish: Locator;
   private readonly btnCancel: Locator;
-  private readonly cartItems: Locator;
   private readonly cartItemNames: Locator;
   private readonly subtotalLabel: Locator;
   private readonly taxLabel: Locator;
@@ -14,38 +13,37 @@ export class SauceCheckoutOverviewPage {
     this.page = page;
     this.btnFinish = page.locator('[data-test="finish"]');
     this.btnCancel = page.locator('[data-test="cancel"]');
-    this.cartItems = page.locator(".cart_item");
-    this.cartItemNames = page.locator(".inventory_item_name");
+    this.cartItemNames = page.locator('[data-test="inventory-item-name"]');
     this.subtotalLabel = page.locator(".summary_subtotal_label");
     this.taxLabel = page.locator(".summary_tax_label");
     this.totalLabel = page.locator(".summary_total_label");
   }
 
-  async getItemCount() {
-    return this.cartItems.count();
+  async getItemCount(): Promise<number> {
+    return this.cartItemNames.count();
   }
 
-  async getItemNames() {
+  async getItemNames(): Promise<string[]> {
     return this.cartItemNames.allTextContents();
   }
 
-  async getSubtotal() {
-    return this.subtotalLabel.textContent();
+  async getSubtotal(): Promise<string> {
+    return this.subtotalLabel.innerText();
   }
 
-  async getTax() {
-    return this.taxLabel.textContent();
+  async getTax(): Promise<string> {
+    return this.taxLabel.innerText();
   }
 
-  async getTotal() {
-    return this.totalLabel.textContent();
+  async getTotal(): Promise<string> {
+    return this.totalLabel.innerText();
   }
 
-  async finish() {
+  async finish(): Promise<void> {
     await this.btnFinish.click();
   }
 
-  async cancel() {
+  async cancel(): Promise<void> {
     await this.btnCancel.click();
   }
 }

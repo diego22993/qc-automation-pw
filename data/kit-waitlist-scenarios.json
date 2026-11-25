@@ -1,0 +1,25 @@
+[
+  {
+    "scenario": "waitlist con zona horaria y Playwright",
+    "emailIdentity": {
+      "firstName": "qa",
+      "surnames": ["Garcia", "Perez", "Lopez", "Gomez", "Mendez"],
+      "domain": "example.com"
+    },
+    "preferences": {
+      "timezone": {
+        "label": "Americas (UTC−8 to −3)",
+        "tagValue": "20947617"
+      },
+      "framework": {
+        "label": "Playwright",
+        "tagValue": "20946498"
+      },
+      "discoverySource": {
+        "label": "Somewhere else",
+        "tagValue": "20948198"
+      }
+    },
+    "expectedSuccessMessage": "You're on the waitlist. I'll email you when a cohort in your timezone opens."
+  }
+]

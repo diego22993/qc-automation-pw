@@ -1,0 +1,17 @@
+[
+  {
+    "scenario": "checkout exitoso con dos productos",
+    "products": ["Sauce Labs Backpack", "Sauce Labs Bike Light"],
+    "customer": {
+      "firstName": "Test",
+      "lastName": "User",
+      "postalCode": "12345"
+    },
+    "expected": {
+      "subtotal": "Item total: $39.98",
+      "tax": "Tax: $3.20",
+      "total": "Total: $43.18",
+      "confirmation": "Thank you for your order!"
+    }
+  }
+]

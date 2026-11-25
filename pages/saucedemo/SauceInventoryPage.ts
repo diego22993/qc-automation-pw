@@ -1,74 +1,67 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
+import { SauceHeader } from "./SauceHeader";
+
+export type ProductSortOption = "az" | "za" | "lohi" | "hilo";
 
 export class SauceInventoryPage {
   private readonly page: Page;
   private readonly inventoryTitle: Locator;
   private readonly productNames: Locator;
   private readonly productPrices: Locator;
+  private readonly inventoryItems: Locator;
+  private readonly sortSelect: Locator;
+  private readonly header: SauceHeader;
 
   constructor(page: Page) {
     this.page = page;
-    this.inventoryTitle = page.getByText("Products", { exact: true });
-    this.productNames = page.locator(".inventory_item_name");
-    this.productPrices = page.locator(".inventory_item_price");
-  }
-  /*
-  async goto() {
-    await this.page.goto("https://www.saucedemo.com/");
-  }
-*/
-  async orderByName(option: string, expectedResult: string) {
-    await this.page.locator(".product_sort_container").selectOption(option);
-    const firstProductName = await this.page
-      .locator(".inventory_item_name")
-      .first()
-      .textContent();
-    expect(firstProductName).toBe(expectedResult);
+    this.inventoryTitle = page.locator('[data-test="title"]');
+    this.productNames = page.locator('[data-test="inventory-item-name"]');
+    this.productPrices = page.locator('[data-test="inventory-item-price"]');
+    this.inventoryItems = page.locator('[data-test="inventory-item"]');
+    this.sortSelect = page.locator('[data-test="product-sort-container"]');
+    this.header = new SauceHeader(page);
   }
 
-  // Luego comprueba que los nombres visibles estén realmente en ese orden.
-  async getProductNames() {
+  async waitUntilLoaded(): Promise<void> {
+    await this.inventoryTitle.waitFor({ state: "visible" });
+  }
+
+  async sortBy(option: ProductSortOption): Promise<void> {
+    await this.sortSelect.selectOption(option);
+  }
+
+  async getProductNames(): Promise<string[]> {
     return this.productNames.allTextContents();
   }
-  // Luego comprueba que los precios visibles estén realmente en ese orden.
-  async getProductPrices() {
+
+  async getProductPrices(): Promise<string[]> {
     return this.productPrices.allTextContents();
   }
 
-  async addProductToCart(productName: string) {
-    await this.page
-      .locator(".inventory_item")
+  async addProductToCart(productName: string): Promise<void> {
+    await this.inventoryItems
       .filter({ hasText: productName })
       .getByRole("button", { name: "Add to cart" })
       .click();
   }
 
-  async getCartBadgeText() {
-    return this.page.locator(".shopping_cart_badge").textContent();
+  async getCartBadgeText(): Promise<string> {
+    return this.header.getCartBadgeText();
   }
 
-  async isCartBadgeVisible() {
-    return this.page.locator(".shopping_cart_badge").isVisible();
+  async isCartBadgeVisible(): Promise<boolean> {
+    return this.header.isCartBadgeVisible();
   }
 
-  async openCart() {
-    await this.page.locator(".shopping_cart_link").click();
+  async openCart(): Promise<void> {
+    await this.header.openCart();
   }
 
-  async orderByPrice(option: string, expectedResult: string) {
-    await this.page.locator(".product_sort_container").selectOption(option);
-    const firstProductPrice = await this.page
-      .locator(".inventory_item_price")
-      .first()
-      .textContent();
-    expect(firstProductPrice).toBe(expectedResult);
-  }
-
-  async openProductDetail(productName: string) {
+  async openProductDetail(productName: string): Promise<void> {
     await this.page.getByText(productName, { exact: true }).click();
   }
 
-  async openInventoryDirectly() {
-    await this.page.goto("https://www.saucedemo.com/inventory.html");
+  async openInventoryDirectly(): Promise<void> {
+    await this.page.goto("/inventory.html");
   }
 }
