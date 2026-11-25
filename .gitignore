@@ -108,5 +108,6 @@ desktop.ini
 node_modules/
 /playwright-report/
 /blob-report/
+/records/
 /playwright/.cache/
 /playwright/.auth/

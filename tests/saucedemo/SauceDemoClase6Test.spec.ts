@@ -15,13 +15,15 @@ test.describe(
         testTitle,
         isSuccessfulLogin ? { tag: "@smoke" } : {},
         async ({ sauceLoginPage }) => {
-          await sauceLoginPage.login(scenario.username, scenario.password);
-
           if (isSuccessfulLogin) {
-            await sauceLoginPage.waitForInventoryPage();
+            await Promise.all([
+              sauceLoginPage.waitForInventoryPage(),
+              sauceLoginPage.login(scenario.username, scenario.password),
+            ]);
             return;
           }
 
+          await sauceLoginPage.login(scenario.username, scenario.password);
           await expect
             .poll(() => sauceLoginPage.getErrorMessage())
             .toContain(scenario.expectedError);
