@@ -4,6 +4,7 @@
 
 - `data/userdata-provider.json` es la fuente de escenarios de autenticacion.
 - `utils/saucedemo/userDataProvider.ts` lee el JSON, valida su estructura y devuelve una lista tipada de `UserDataProvider`.
+- `fixtures/saucedemo.fixture.ts` extiende el `test` de Playwright con `sauceLoginPage`, instancia el Page Object y abre el login.
 - `tests/saucedemo/dataProviderClase5.spec.ts` crea un test por escenario y verifica el resultado con `SauceLoginPage`.
 - `pages/saucedemo/SauceLoginPage.ts` encapsula las acciones y consultas de la pantalla; no debe contener datos de prueba.
 
@@ -32,3 +33,7 @@ Los escenarios exitosos deben usar `msjError: ""`. Los escenarios fallidos deben
 5. Ejecuta `npm run test:saucedemo` para validar los escenarios de SauceDemo en el navegador.
 
 No importes el JSON directamente desde los specs: usa `loadUserDataProvider()` para mantener un solo punto de lectura, validacion y tipado. Mantén las acciones de interfaz en los Page Objects y las expectativas del escenario en el spec.
+
+## Fixture de login
+
+Los specs de SauceDemo que necesitan el formulario deben importar `test` y `expect` desde `fixtures/saucedemo.fixture.ts` y solicitar `sauceLoginPage` en el test o hook. El fixture abre el login antes de entregar el Page Object; no completa credenciales. Usa `sauceLoginPage.login()` para enviar las credenciales del escenario y evita crear otra instancia o repetir `goto()`.
