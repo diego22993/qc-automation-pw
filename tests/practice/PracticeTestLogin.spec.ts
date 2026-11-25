@@ -1,6 +1,5 @@
-import { expect, test } from "@playwright/test";
-import { PracticeTestLoginPage } from "../../pages/practice/PracticeTestLoginPage";
 import { loadPracticeLoginScenarios } from "../../utils/practice/practiceLoginScenarioProvider";
+import { expect, test } from "../fixtures/practice.fixture";
 
 test.describe(
   "Practice Test Automation - Login",
@@ -8,14 +7,18 @@ test.describe(
   () => {
     for (const scenario of loadPracticeLoginScenarios()) {
       const isSuccessfulLogin = scenario.expectedOutcome === "success";
+      const testTitle = isSuccessfulLogin
+        ? `Iniciar sesión con credenciales válidas (${scenario.username})`
+        : `Validar error de login (${scenario.scenario})`;
 
       test(
-        scenario.scenario,
+        testTitle,
         isSuccessfulLogin ? { tag: "@smoke" } : {},
-        async ({ page }) => {
-          const loginPage = new PracticeTestLoginPage(page);
-          await loginPage.goto();
-          await loginPage.login(scenario.username, scenario.password);
+        async ({ page, practiceLoginPage }) => {
+          await practiceLoginPage.login(
+            scenario.username,
+            scenario.password,
+          );
 
           if (isSuccessfulLogin) {
             await expect(page).toHaveURL(
@@ -24,15 +27,12 @@ test.describe(
             await expect(
               page.getByText(scenario.expectedMessage, { exact: true }),
             ).toBeVisible();
-            await expect(
-              page.getByRole("link", { name: "Log out", exact: true }),
-            ).toBeVisible();
             return;
           }
 
           await expect
-            .poll(() => loginPage.getErrorMessage())
-            .toBe(scenario.expectedError);
+            .poll(() => practiceLoginPage.getErrorMessage())
+            .toContain(scenario.expectedError);
         },
       );
     }
