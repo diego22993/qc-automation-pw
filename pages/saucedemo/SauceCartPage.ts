@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 
 export class SauceCartPage {
   private readonly page: Page;
@@ -51,6 +51,9 @@ export class SauceCartPage {
 
   async checkout() {
     await this.btnCheckout.click();
+    await expect(
+      this.page.getByText("Checkout: Your Information", { exact: true }),
+    ).toBeVisible();
   }
 
   async removeItem() {
@@ -66,6 +69,7 @@ export class SauceCartPage {
 
   async continueShopping() {
     await this.btnContinueShopping.click();
+    await expect(this.page.getByText("Products", { exact: true })).toBeVisible();
   }
 
   async goToShoppingCart() {

@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 
 export class SauceCheckoutInformationPage {
   private readonly page: Page;
@@ -62,5 +62,8 @@ export class SauceCheckoutInformationPage {
     await this.inputLastname.fill(lastName);
     await this.inputPostalCode.fill(postalCode);
     await this.btnContinue.click();
+    await expect(
+      this.page.getByText("Checkout: Overview", { exact: true }),
+    ).toBeVisible();
   }
 }
