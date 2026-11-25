@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { PracticeTestLoginPage } from "../../pages/practice/PracticeTestLoginPage";
+import { expect, test } from "../fixtures/pracice.fixture";
 import { loadPracticeLoginScenarios } from "../../utils/practice/practiceLoginScenarioProvider";
 
 test.describe(
@@ -12,10 +11,11 @@ test.describe(
       test(
         scenario.scenario,
         isSuccessfulLogin ? { tag: "@smoke" } : {},
-        async ({ page }) => {
-          const loginPage = new PracticeTestLoginPage(page);
-          await loginPage.goto();
-          await loginPage.login(scenario.username, scenario.password);
+        async ({ page, practiceLoginPage }) => {
+          await practiceLoginPage.login(
+            scenario.username,
+            scenario.password,
+          );
 
           if (isSuccessfulLogin) {
             await expect(page).toHaveURL(
@@ -31,7 +31,7 @@ test.describe(
           }
 
           await expect
-            .poll(() => loginPage.getErrorMessage())
+            .poll(() => practiceLoginPage.getErrorMessage())
             .toBe(scenario.expectedError);
         },
       );
